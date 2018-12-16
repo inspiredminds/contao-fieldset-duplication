@@ -29,5 +29,5 @@ The following options can be changed:
 ```
 If you want to store the additional data in your database table (using the form 
 generator's ability to store the data in the database), you need to add a column 
-called `fieldset_duplicates` to your target table. This column will then contain the 
-additionally submitted fields in a JSON encoded object.
+called `fieldset_duplicates` to your target table. This column will then contain 
+the additionally submitted fields in a JSON encoded object.
