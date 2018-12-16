@@ -1,0 +1,6 @@
+<script src="bundles/contaofieldsetduplication/jquery.fieldset.duplication.min.js"></script>
+<script>
+  (function($){
+    $('fieldset.allow-duplication').fieldsetDuplication();
+  })(jQuery);
+</script>

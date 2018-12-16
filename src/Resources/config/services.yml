@@ -1,0 +1,17 @@
+services:
+  _defaults:
+    public: true
+
+  _instanceof:
+    Contao\CoreBundle\Framework\FrameworkAwareInterface:
+      calls:
+        - ["setFramework", ["@contao.framework"]]
+
+  inspiredminds.fieldsetduplication.listener.formhook:
+    class: InspiredMinds\ContaoFieldsetDuplication\EventListener\FormHookListener
+    arguments:
+      - '@request_stack'
+      - '@inspiredminds.fieldsetduplication.helper.field'
+
+  inspiredminds.fieldsetduplication.helper.field:
+    class: InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper

@@ -1,0 +1,39 @@
+{
+    "name": "inspiredminds/contao-fieldset-duplication",
+    "description": "Contao extension to allow the duplication of form fieldsets in the front end by the user for additional input fields.",
+    "keywords": ["contao", "fieldset", "form", "duplication"],
+    "type": "contao-bundle",
+    "homepage": "http://www.inspiredminds.at",
+    "license": "LGPL-3.0-or-later",
+    "authors": [
+        {
+            "name":"Fritz Michael Gschwantner",
+            "homepage":"http://www.inspiredminds.at",
+            "email":"fmg@inspiredminds.at",
+            "role":"Developer"
+        }
+    ],
+    "support": {
+        "email": "fmg@inspiredminds.at",
+        "issues": "https://github.com/inspiredminds/contao-fieldset-duplication/issues",
+        "source": "https://github.com/inspiredminds/contao-fieldset-duplication",
+        "forum": "https://community.contao.org/de"
+    },
+    "require":{
+        "php": ">=7.1",
+        "contao/core-bundle": "^4.4",
+        "composer/semver": "^1.0",
+        "jean85/pretty-package-versions": "^1.0"
+    },
+    "require-dev": {
+         "contao/manager-plugin": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "InspiredMinds\\ContaoFieldsetDuplication\\": "src/"
+        }
+    },
+    "extra": {
+        "contao-manager-plugin": "InspiredMinds\\ContaoFieldsetDuplication\\ContaoManager\\Plugin"
+    }
+}
