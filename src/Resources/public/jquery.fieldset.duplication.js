@@ -79,6 +79,9 @@
                     {
                         $input.val('');
                     }
+
+                    $input.removeAttr('checked');
+                    $input.prop('checked', false);
                 });
 
                 // remove some other stuff
