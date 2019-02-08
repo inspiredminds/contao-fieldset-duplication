@@ -70,18 +70,14 @@
                     var newName = oldName + '_duplicate_' + duplicateIndex;
                     $input.attr('name', newName);
 
-                    $input.closest('.widget').find('label').each(function()
-                    {
-                        $(this).attr('for', newId);
-                    });
+                    $input.closest('.widget').find('label[for="'+oldId+'"]').attr('for', newId);
 
-                    if ($input.val())
+                    if ($input.val() && $input.val() !== $input.attr('value'))
                     {
                         $input.val('');
                     }
 
-                    $input.removeAttr('checked');
-                    $input.prop('checked', false);
+                    $input.not('[checked]').prop('checked', false);
                 });
 
                 // remove some other stuff
