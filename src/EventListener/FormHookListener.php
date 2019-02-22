@@ -71,8 +71,16 @@ class FormHookListener implements FrameworkAwareInterface
                 }
             }
 
+            $processed = [];
+            $fieldsetDuplicates = [];
+
             // search for duplicates
             foreach (array_keys($request->request->all()) as $duplicateName) {
+                // check if already processed
+                if (\in_array($duplicateName, $processed)) {
+                    continue;
+                }
+
                 // check if it is a duplicate
                 if (false !== ($intPos = strpos($duplicateName, '_duplicate_'))) {
                     // get the non duplicate name
@@ -88,6 +96,8 @@ class FormHookListener implements FrameworkAwareInterface
                                 // new sorting base number
                                 $sorting = $fieldsetGroup[\count($fieldsetGroup) - 1]->sorting;
 
+                                $duplicatedFields = [];
+
                                 foreach ($fieldsetGroup as $field) {
                                     // set the actual duplicate name
                                     $duplicateName = $field->name.'_duplicate_'.$duplicateNumber;
@@ -98,11 +108,14 @@ class FormHookListener implements FrameworkAwareInterface
                                     // remove allow duplication class
                                     if ($this->fieldHelper->isFieldsetStart($clone)) {
                                         $clone->class = implode(' ', array_diff(explode(' ', $clone->class), ['allow-duplication']));
-                                        $clone->class .= 'duplicate-fieldset-'.$field->id.' duplicate';
+                                        $clone->class .= ($clone->class ? ' ' : '') . 'duplicate-fieldset-'.$field->id.' duplicate';
                                     }
 
                                     // set the id
                                     $clone->id = $field->id.'_duplicate_'.$duplicateNumber;
+
+                                    // set the original id
+                                    $clone->originalId = $field->id;
 
                                     // set the name
                                     $clone->name = $duplicateName;
@@ -114,24 +127,54 @@ class FormHookListener implements FrameworkAwareInterface
                                     $clone->sorting = ++$sorting;
 
                                     // add the clone
-                                    $fields[$field->name ? $duplicateName : $sorting] = $clone;
+                                    $duplicatedFields[] = $clone;
+
+                                    // add to processed
+                                    $processed[] = $duplicateName;
                                 }
 
-                                break 3;
+                                $fieldsetDuplicates[] = $duplicatedFields;
+
+                                break 2;
                             }
                         }
                     }
                 }
             }
 
-            // re-sort
-            uasort($fields, function ($a, $b) {
-                if ($a->sorting === $b->sorting) {
-                    return 0;
+            // reverse the fieldset duplicates
+            $fieldsetDuplicates = array_reverse($fieldsetDuplicates);
+
+            // process $fields
+            $fields = array_values($fields);
+
+            // go through the duplicated fieldsets
+            foreach ($fieldsetDuplicates as $duplicatedFieldset) {
+                // search for the stop field
+                $stopId = null;
+                foreach ($duplicatedFieldset as $duplicatedField) {
+                    if ($this->fieldHelper->isFieldsetStop($duplicatedField)) {
+                        $stopId = $duplicatedField->originalId;
+                        break;
+                    }
                 }
 
-                return ($a->sorting < $b->sorting) ? -1 : 1;
-            });
+                // search for the index position of the original stop field
+                if (null !== $stopId) {
+                    $stopIdx = null;
+                    for ($i = 0; $i < count($fields); ++$i) {
+                        if ($fields[$i]->id === $stopId) {
+                            $stopIdx = $i;
+                            break;
+                        }
+                    }
+
+                    // insert fields after original stop field
+                    if (null !== $stopIdx) {
+                        array_splice($fields, $stopIdx + 1, 0, $duplicatedFieldset);
+                    }
+                }
+            }
         }
 
         // return the fields

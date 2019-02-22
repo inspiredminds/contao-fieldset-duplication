@@ -57,23 +57,42 @@
                 var $clone = $fieldset.clone();
 
                 // process input fields
-                $clone.find('input[name], select[name], textarea[name]').each(function()
-                {
+                $clone.find('input[name], select[name], textarea[name]').each(function() {
                     var $input = $(this);
                     $input.removeClass('error');
                     var duplicateIndex = $fieldsets.length + 1;
+
                     var oldId = $input.attr('id');
-                    var newId = oldId + '_duplicate_' + duplicateIndex;
-                    $input.attr('id', newId);
+                    if (typeof oldId !== 'undefined') {
+                        var isDuplicate = oldId.indexOf('_duplicate_');
+                        if (isDuplicate >= 0) {
+                            oldId = oldId.substr(0, isDuplicate);
+                        }
+                        var newId = oldId + '_duplicate_' + duplicateIndex;
+
+                        $input.closest('.widget').find('label[for="'+$input.attr('id')+'"]').each(function() {
+                            var $label = $(this);
+                            $label.attr('for', newId);
+
+                            if (typeof $label.attr('id') !== 'undefined') {
+                                $label.attr('id', $label.attr('id') + '_duplicate_' + duplicateIndex);
+                            }
+                        });
+
+                        $input.attr('id', newId);
+                    }
 
                     var oldName = $input.attr('name');
-                    var newName = oldName + '_duplicate_' + duplicateIndex;
-                    $input.attr('name', newName);
+                    if (typeof oldName !== 'undefined') {
+                        var isDuplicate = oldName.indexOf('_duplicate_');
+                        if (isDuplicate >= 0) {
+                            oldName = oldName.substr(0, isDuplicate);
+                        }
+                        var newName = oldName + '_duplicate_' + duplicateIndex;
+                        $input.attr('name', newName);
+                    }
 
-                    $input.closest('.widget').find('label[for="'+oldId+'"]').attr('for', newId);
-
-                    if ($input.val() && $input.val() !== $input.attr('value'))
-                    {
+                    if ($input.val() && $input.val() !== $input.attr('value')) {
                         $input.val('');
                     }
 
