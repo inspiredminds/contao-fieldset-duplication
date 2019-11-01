@@ -1,0 +1,20 @@
+<?php if ($this->values): ?>
+<table>
+    <thead>
+        <tr>
+            <?php foreach (array_keys($this->values[0]) as $name): ?>
+            <td><?= $this->labels[$name] ?? $name ?></td>
+            <?php endforeach ?>
+        </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($this->values as $row): ?>
+        <tr>
+            <?php foreach ($row as $value): ?>
+            <td><?= $value ?></td>
+            <?php endforeach ?>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+<?php endif ?>

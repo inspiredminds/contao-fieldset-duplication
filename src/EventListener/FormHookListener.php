@@ -12,11 +12,15 @@ declare(strict_types=1);
 
 namespace InspiredMinds\ContaoFieldsetDuplication\EventListener;
 
+use Contao\Config;
 use Contao\CoreBundle\Framework\FrameworkAwareInterface;
 use Contao\CoreBundle\Framework\FrameworkAwareTrait;
 use Contao\Database;
 use Contao\Form;
+use Contao\FrontendTemplate;
+use Contao\StringUtil;
 use Contao\Widget;
+use FormFieldModel;
 use InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -51,25 +55,7 @@ class FormHookListener implements FrameworkAwareInterface
 
         // check if form was submitted
         if ($request->request->get('FORM_SUBMIT') === $formId) {
-            // field set groups
-            $fieldsetGroups = [];
-
-            // field set group
-            $fieldsetGroup = [];
-
-            // go through each field
-            foreach ($fields as $field) {
-                // check if we can process duplicates
-                if ($this->fieldHelper->isFieldsetStart($field)) {
-                    $fieldsetGroup[] = $field;
-                } elseif ($this->fieldHelper->isFieldsetStop($field)) {
-                    $fieldsetGroup[] = $field;
-                    $fieldsetGroups[$fieldsetGroup[0]->id] = $fieldsetGroup;
-                    $fieldsetGroup = [];
-                } elseif (!empty($fieldsetGroup)) {
-                    $fieldsetGroup[] = $field;
-                }
-            }
+            $fieldsetGroups = $this->buildFieldsetGroups($fields);
 
             $processed = [];
             $fieldsetDuplicates = [];
@@ -200,5 +186,95 @@ class FormHookListener implements FrameworkAwareInterface
         }
 
         return $newSet;
+    }
+
+    public function onPrepareFormData(array &$submittedData, array $labels, array $fields, Form $form): void
+    {
+        $fieldsetGroups = $this->buildFieldsetGroups($fields);
+        $values         = $this->groupFieldsetValues($fieldsetGroups, $submittedData);
+
+        // Disable debug mode so that no html comments are rendered in the templates
+        $debugMode = Config::get('debugMode');
+        Config::set('debugMode', false);
+
+        foreach ($values as $row) {
+            if (!$row['config']->allowDuplication) {
+                continue;
+            }
+
+            $templateFormats = StringUtil::deserialize($row['config']->notificationTokenTemplates, true);
+            foreach ($templateFormats as $format) {
+                if (!$format['format'] || !$format['template']) {
+                    continue;
+                }
+
+                $template = new FrontendTemplate($format['template']);
+                $template->setData(
+                    [
+                        'labels' => $labels,
+                        'form'   => $form,
+                        'config' => $row['config'],
+                        'values' => $row['data']
+                    ]
+                );
+
+                $submittedData[$row['config']->name . '_' . $format['format']] = $template->parse();
+            }
+        }
+
+        Config::set('debugMode', $debugMode);
+    }
+
+    /**
+     * @param array|Widget[]|FormFieldModel[] $fields
+     *
+     * @return array
+     */
+    private function buildFieldsetGroups(array $fields) : array
+    {
+        // field set groups
+        $fieldsetGroups = [];
+
+        // field set group
+        $fieldsetGroup = [];
+
+        // go through each field
+        foreach ($fields as $field) {
+            // check if we can process duplicates
+            if ($this->fieldHelper->isFieldsetStart($field)) {
+                $fieldsetGroup[] = $field;
+            } elseif ($this->fieldHelper->isFieldsetStop($field)) {
+                $fieldsetGroup[]                       = $field;
+                $fieldsetGroups[$fieldsetGroup[0]->id] = $fieldsetGroup;
+                $fieldsetGroup                         = [];
+            } elseif (!empty($fieldsetGroup)) {
+                $fieldsetGroup[] = $field;
+            }
+        }
+
+        return $fieldsetGroups;
+    }
+
+    private function groupFieldsetValues(array $fieldsetGroups, array $submittedData): array
+    {
+        $data = [];
+
+        foreach ($fieldsetGroups as $fieldsetId => $fieldsetGroup) {
+            $row            = [];
+            $referenceGroup = $fieldsetGroup[0]->originalId > 0
+                ? $fieldsetGroups[$fieldsetGroup[0]->originalId]
+                : $fieldsetGroup;
+
+            foreach ($fieldsetGroup as $formFieldIndex => $formFieldModel) {
+                if (array_key_exists($formFieldModel->name, $submittedData)) {
+                    $row[$referenceGroup[$formFieldIndex]->name] = $submittedData[$formFieldModel->name];
+                }
+            }
+
+            $data[$referenceGroup[0]->id]['config'] = $referenceGroup[0];
+            $data[$referenceGroup[0]->id]['data'][] = $row;
+        }
+
+        return $data;
     }
 }

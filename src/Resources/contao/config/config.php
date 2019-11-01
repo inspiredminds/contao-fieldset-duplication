@@ -10,8 +10,9 @@ declare(strict_types=1);
  * @license LGPL-3.0-or-later
  */
 
-$GLOBALS['TL_HOOKS']['loadFormField'][] = ['inspiredminds.fieldsetduplication.listener.formhook', 'onLoadFormField'];
+$GLOBALS['TL_HOOKS']['loadFormField'][]     = ['inspiredminds.fieldsetduplication.listener.formhook', 'onLoadFormField'];
 $GLOBALS['TL_HOOKS']['compileFormFields'][] = ['inspiredminds.fieldsetduplication.listener.formhook', 'onCompileFormFields'];
+$GLOBALS['TL_HOOKS']['prepareFormData'][]   = ['inspiredminds.fieldsetduplication.listener.formhook', 'onPrepareFormData'];
 
 if (!\is_array($GLOBALS['TL_HOOKS']['storeFormData'])) {
     $GLOBALS['TL_HOOKS']['storeFormData'] = [];
