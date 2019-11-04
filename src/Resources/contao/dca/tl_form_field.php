@@ -26,27 +26,27 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['allowDuplication'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['notificationTokenTemplates'] = [
-    'label'            => &$GLOBALS['TL_LANG']['tl_form_field']['notificationTokenTemplates'],
-    'exclude'          => true,
-    'inputType'        => 'multiColumnWizard',
+    'label' => &$GLOBALS['TL_LANG']['tl_form_field']['notificationTokenTemplates'],
+    'exclude' => true,
+    'inputType' => 'multiColumnWizard',
     'options_callback' => [FormFieldDcaListener::class, 'templateOptions'],
-    'eval'             => [
-        'tl_class'     => 'clr',
+    'eval' => [
+        'tl_class' => 'clr',
         'columnFields' => [
-            'format'   => [
-                'label'     => &$GLOBALS['TL_LANG']['tl_form_field']['notificationTokenFormat'],
+            'format' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_form_field']['notificationTokenFormat'],
                 'inputType' => 'text',
-                'eval'      => ['style' => 'width: 200px'],
+                'eval' => ['style' => 'width: 200px'],
             ],
             'template' => [
-                'label'            => &$GLOBALS['TL_LANG']['tl_form_field']['notificationTokenFormatTemplate'],
-                'inputType'        => 'select',
+                'label' => &$GLOBALS['TL_LANG']['tl_form_field']['notificationTokenFormatTemplate'],
+                'inputType' => 'select',
                 'options_callback' => [FormFieldDcaListener::class, 'templateOptions'],
-                'eval'             => ['includeBlankOption' => true, 'chosen' => true, 'style' => 'width:400px'],
+                'eval' => ['includeBlankOption' => true, 'chosen' => true, 'style' => 'width:400px'],
             ],
         ],
     ],
-    'sql'              => "blob NULL",
+    'sql' => 'blob NULL',
 ];
 
 $fieldsetPalette = System::getContainer()->get('inspiredminds.fieldsetduplication.helper.field')->getFieldsetPalette();

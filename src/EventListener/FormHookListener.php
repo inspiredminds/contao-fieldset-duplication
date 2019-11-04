@@ -63,7 +63,7 @@ class FormHookListener implements FrameworkAwareInterface
             // search for duplicates
             foreach (array_keys($request->request->all()) as $duplicateName) {
                 // check if already processed
-                if (\in_array($duplicateName, $processed)) {
+                if (\in_array($duplicateName, $processed, true)) {
                     continue;
                 }
 
@@ -94,7 +94,7 @@ class FormHookListener implements FrameworkAwareInterface
                                     // remove allow duplication class
                                     if ($this->fieldHelper->isFieldsetStart($clone)) {
                                         $clone->class = implode(' ', array_diff(explode(' ', $clone->class), ['allow-duplication']));
-                                        $clone->class .= ($clone->class ? ' ' : '') . 'duplicate-fieldset-'.$field->id.' duplicate';
+                                        $clone->class .= ($clone->class ? ' ' : '').'duplicate-fieldset-'.$field->id.' duplicate';
                                     }
 
                                     // set the id
@@ -148,7 +148,7 @@ class FormHookListener implements FrameworkAwareInterface
                 // search for the index position of the original stop field
                 if (null !== $stopId) {
                     $stopIdx = null;
-                    for ($i = 0; $i < count($fields); ++$i) {
+                    for ($i = 0; $i < \count($fields); ++$i) {
                         if ($fields[$i]->id === $stopId) {
                             $stopIdx = $i;
                             break;
@@ -191,7 +191,7 @@ class FormHookListener implements FrameworkAwareInterface
     public function onPrepareFormData(array &$submittedData, array $labels, array $fields, Form $form): void
     {
         $fieldsetGroups = $this->buildFieldsetGroups($fields);
-        $values         = $this->groupFieldsetValues($fieldsetGroups, $submittedData);
+        $values = $this->groupFieldsetValues($fieldsetGroups, $submittedData);
 
         // Disable debug mode so that no html comments are rendered in the templates
         $debugMode = Config::get('debugMode');
@@ -212,13 +212,13 @@ class FormHookListener implements FrameworkAwareInterface
                 $template->setData(
                     [
                         'labels' => $labels,
-                        'form'   => $form,
+                        'form' => $form,
                         'config' => $row['config'],
-                        'values' => $row['data']
+                        'values' => $row['data'],
                     ]
                 );
 
-                $submittedData[$row['config']->name . '_' . $format['format']] = $template->parse();
+                $submittedData[$row['config']->name.'_'.$format['format']] = $template->parse();
             }
         }
 
@@ -227,10 +227,8 @@ class FormHookListener implements FrameworkAwareInterface
 
     /**
      * @param array|Widget[]|FormFieldModel[] $fields
-     *
-     * @return array
      */
-    private function buildFieldsetGroups(array $fields) : array
+    private function buildFieldsetGroups(array $fields): array
     {
         // field set groups
         $fieldsetGroups = [];
@@ -244,9 +242,9 @@ class FormHookListener implements FrameworkAwareInterface
             if ($this->fieldHelper->isFieldsetStart($field)) {
                 $fieldsetGroup[] = $field;
             } elseif ($this->fieldHelper->isFieldsetStop($field)) {
-                $fieldsetGroup[]                       = $field;
+                $fieldsetGroup[] = $field;
                 $fieldsetGroups[$fieldsetGroup[0]->id] = $fieldsetGroup;
-                $fieldsetGroup                         = [];
+                $fieldsetGroup = [];
             } elseif (!empty($fieldsetGroup)) {
                 $fieldsetGroup[] = $field;
             }
@@ -260,13 +258,13 @@ class FormHookListener implements FrameworkAwareInterface
         $data = [];
 
         foreach ($fieldsetGroups as $fieldsetId => $fieldsetGroup) {
-            $row            = [];
+            $row = [];
             $referenceGroup = $fieldsetGroup[0]->originalId > 0
                 ? $fieldsetGroups[$fieldsetGroup[0]->originalId]
                 : $fieldsetGroup;
 
             foreach ($fieldsetGroup as $formFieldIndex => $formFieldModel) {
-                if (array_key_exists($formFieldModel->name, $submittedData)) {
+                if (\array_key_exists($formFieldModel->name, $submittedData)) {
                     $row[$referenceGroup[$formFieldIndex]->name] = $submittedData[$formFieldModel->name];
                 }
             }
