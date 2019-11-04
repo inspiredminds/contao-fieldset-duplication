@@ -13,5 +13,9 @@ services:
       - '@request_stack'
       - '@inspiredminds.fieldsetduplication.helper.field'
 
+  InspiredMinds\ContaoFieldsetDuplication\EventListener\FormFieldDcaListener:
+    arguments:
+      - '@contao.framework'
+
   inspiredminds.fieldsetduplication.helper.field:
     class: InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper

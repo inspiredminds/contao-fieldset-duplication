@@ -36,7 +36,7 @@ class FieldHelper
 
     public function getFieldsetType($field): ?string
     {
-        if (false === strpos($field->type, 'fieldset')) {
+        if (!\is_string($field->type) || false === strpos($field->type, 'fieldset')) {
             return null;
         }
 
