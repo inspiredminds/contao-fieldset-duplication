@@ -31,3 +31,14 @@ If you want to store the additional data in your database table (using the form
 generator's ability to store the data in the database), you need to add a column 
 called `fieldset_duplicates` to your target table. This column will then contain 
 the additionally submitted fields in a JSON encoded object.
+
+Notification tokens
+-------------------
+
+If you need your fieldset rendered as notification token, you can define notification token formats. Just define the fieldset name, a format name and select a template. The fieldset will be available at token form_{NAME}_{format} ({NAME}_{format} if you don't use the notification center).
+
+Following templates are shipped with this extension:
+
+* *nc_fieldset_duplication_text*: Renders the fieldset data as `label: value` pairs
+* *nc_fieldset_duplication_html*: Renders the fieldset data as html table
+* *nc_fieldset_duplication_json*: Renders the fieldset data as json string
