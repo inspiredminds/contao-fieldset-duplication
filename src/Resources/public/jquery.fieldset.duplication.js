@@ -92,7 +92,8 @@
                         $input.attr('name', newName);
                     }
 
-                    if ($input.val() && $input.val() !== $input.attr('value')) {
+                    var value = $input.attr('value');
+                    if ($input.val() && typeof value !== typeof undefined && value !== false && $input.val() !== value) {
                         $input.val('');
                     }
 
