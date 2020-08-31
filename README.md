@@ -1,4 +1,3 @@
-[![](https://img.shields.io/maintenance/yes/2019.svg)](https://github.com/inspiredminds/contao-fieldset-duplication)
 [![](https://img.shields.io/packagist/v/inspiredminds/contao-fieldset-duplication.svg)](https://packagist.org/packages/inspiredminds/contao-fieldset-duplication)
 [![](https://img.shields.io/packagist/dt/inspiredminds/contao-fieldset-duplication.svg)](https://packagist.org/packages/inspiredminds/contao-fieldset-duplication)
 
