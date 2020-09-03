@@ -17,7 +17,7 @@ The following options can be changed:
   (function($){
     $('fieldset.allow-duplication').fieldsetDuplication({
       /* when true, prepends the button wrapper within the fieldset, instead of appending */
-      prepend: false
+      prepend: false,
       /* text content of the add button */
       buttonAdd: '+',
       /* text content of the remove button */
