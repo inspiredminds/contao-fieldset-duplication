@@ -19,6 +19,12 @@
         "source": "https://github.com/inspiredminds/contao-fieldset-duplication",
         "forum": "https://community.contao.org/de"
     },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/fritzmg"
+        }
+    ],
     "require":{
         "php": ">=7.1",
         "ext-json": "*",
