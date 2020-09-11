@@ -3,7 +3,7 @@
     "description": "Contao extension to allow the duplication of form fieldsets in the front end by the user for additional input fields.",
     "keywords": ["contao", "fieldset", "form", "duplication"],
     "type": "contao-bundle",
-    "homepage": "http://www.inspiredminds.at",
+    "homepage": "https://github.com/inspiredminds/contao-fieldset-duplication",
     "license": "LGPL-3.0-or-later",
     "authors": [
         {
