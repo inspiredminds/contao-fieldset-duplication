@@ -36,7 +36,7 @@ Notification tokens
 
 If you need your fieldset rendered as notification tokens, you can define notification token formats. Just define the fieldset name, a format name and select a template. The fieldset will be available at token `form_{NAME}_{FORMAT}` (`{NAME}_{FORMAT}` if you don't use the notification center).
 
-Following templates are shipped with this extension:
+The following templates are shipped with this extension:
 
 * *nc_fieldset_duplication_text*: Renders the fieldset data as `label: value` pairs
 * *nc_fieldset_duplication_html*: Renders the fieldset data as html table
