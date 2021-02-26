@@ -26,11 +26,11 @@
         }
     ],
     "require":{
-        "php": ">=7.1",
+        "php": "^7.1 || ^8.0",
         "ext-json": "*",
         "contao/core-bundle": "^4.4",
-        "composer/semver": "^1.0",
-        "jean85/pretty-package-versions": "^1.0",
+        "composer/semver": "^1.0 || ^2.0 || ^3.0",
+        "jean85/pretty-package-versions": "^1.0 || ^2.0",
         "menatwork/contao-multicolumnwizard-bundle": "^3.4"
     },
     "require-dev": {
