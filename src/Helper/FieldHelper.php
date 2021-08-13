@@ -13,13 +13,18 @@ declare(strict_types=1);
 namespace InspiredMinds\ContaoFieldsetDuplication\Helper;
 
 use Composer\Semver\Semver;
+use Jean85\Exception\ReplacedPackageException;
 use Jean85\PrettyVersions;
 
 class FieldHelper
 {
     public function getFieldsetPalette(): string
     {
-        $contaoVersion = PrettyVersions::getVersion('contao/core-bundle');
+        try {
+            $contaoVersion = PrettyVersions::getVersion('contao/core-bundle');
+        } catch (ReplacedPackageException $e) {
+            $contaoVersion = PrettyVersions::getVersion('contao/contao');
+        }
 
         return Semver::satisfies($contaoVersion->getShortVersion(), '>=4.5') ? 'fieldsetStart' : 'fieldsetfsStart';
     }
@@ -40,7 +45,11 @@ class FieldHelper
             return null;
         }
 
-        $contaoVersion = PrettyVersions::getVersion('contao/core-bundle');
+        try {
+            $contaoVersion = PrettyVersions::getVersion('contao/core-bundle');
+        } catch (ReplacedPackageException $e) {
+            $contaoVersion = PrettyVersions::getVersion('contao/contao');
+        }
 
         if (Semver::satisfies($contaoVersion->getShortVersion(), '>=4.5')) {
             return strtolower(substr($field->type, 8));
