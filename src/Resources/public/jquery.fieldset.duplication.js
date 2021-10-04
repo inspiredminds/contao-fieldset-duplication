@@ -17,6 +17,7 @@
             var $fieldsets = null;
             var selector = null;
             var maxRows = null;
+            var duplicateIndex = 0;
 
             // determine the fieldset group selector
             var classList = $original.attr('class').split(/\s+/);
@@ -67,6 +68,8 @@
 
                 // clone the fieldset
                 var $clone = $fieldset.clone();
+                
+                duplicateIndex++;
 
                 // process input fields
                 $clone.find('input[name], select[name], textarea[name]').each(function() {
