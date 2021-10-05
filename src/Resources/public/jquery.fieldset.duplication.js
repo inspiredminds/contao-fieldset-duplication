@@ -61,7 +61,7 @@
                 if ($fieldsets.length >= maxRows)
                 {
                     // trigger event
-                    $(document).trigger('fieldset-clone-rejected', [$fieldset]);
+                    $(document).trigger('fieldset-clone-rejected', [$fieldset, fieldsets, maxRows]);
                     return;
                 }
 
@@ -128,6 +128,17 @@
 
                 // update the fieldset list
                 updateFieldsets();
+                
+                // disable the 'add' button if no additional row is allowed
+                if ($fieldsets.length >= maxRows)
+                {
+                    $fieldsets.each(function(i, e)
+                    {
+                        var $fieldset = $(this);
+                        $fieldset.find('.duplication-button--add').addClass('disabled');
+                        $fieldset.find('.duplication-button--add').attr('disabled', 'disabled');
+                    });
+                }
 
                 // trigger event
                 $(document).trigger('fieldset-cloned', [$clone]);
