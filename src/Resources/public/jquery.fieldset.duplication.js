@@ -63,7 +63,6 @@
                 $clone.find('input[name], select[name], textarea[name]').each(function() {
                     var $input = $(this);
                     $input.removeClass('error');
-                    var duplicateIndex = $fieldsets.length + 1;
 
                     var oldId = $input.attr('id');
                     if (typeof oldId !== 'undefined') {
