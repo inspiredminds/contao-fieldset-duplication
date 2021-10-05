@@ -16,6 +16,7 @@
             var $original = $(this);
             var $fieldsets = null;
             var selector = null;
+            var maxRows = null;
 
             // determine the fieldset group selector
             var classList = $original.attr('class').split(/\s+/);
@@ -24,6 +25,15 @@
                 if (item.match(/duplicate-fieldset-/))
                 {
                     selector = '.' + item;
+                    return false;
+                }
+            });
+            // determine the max rows configuration
+            $.each(classList, function(index, item)
+            {
+                if (item.match(/duplicate-fieldset-maxRows-/))
+                {
+                    maxRows = item.substring("duplicate-fieldset-maxRows-".length);
                     return false;
                 }
             });
@@ -48,8 +58,10 @@
 
             var cloneFieldset = function($fieldset)
             {
-                if ($fieldsets.length >= 50)
+                if ($fieldsets.length >= maxRows)
                 {
+                    // trigger event
+                    $(document).trigger('fieldset-clone-rejected', [$fieldset]);
                     return;
                 }
 
