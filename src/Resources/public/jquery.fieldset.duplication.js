@@ -16,6 +16,7 @@
             var $original = $(this);
             var $fieldsets = null;
             var selector = null;
+            var duplicateIndex = 0;
 
             // determine the fieldset group selector
             var classList = $original.attr('class').split(/\s+/);
@@ -55,12 +56,13 @@
 
                 // clone the fieldset
                 var $clone = $fieldset.clone();
+                
+                duplicateIndex++;
 
                 // process input fields
                 $clone.find('input[name], select[name], textarea[name]').each(function() {
                     var $input = $(this);
                     $input.removeClass('error');
-                    var duplicateIndex = $fieldsets.length + 1;
 
                     var oldId = $input.attr('id');
                     if (typeof oldId !== 'undefined') {
