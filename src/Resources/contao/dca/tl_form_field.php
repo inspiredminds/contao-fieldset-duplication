@@ -15,7 +15,7 @@ use Contao\System;
 use InspiredMinds\ContaoFieldsetDuplication\EventListener\FormFieldDcaListener;
 
 $GLOBALS['TL_DCA']['tl_form_field']['palettes']['__selector__'][] = 'allowDuplication';
-$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['allowDuplication'] .= 'name,notificationTokenTemplates';
+$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['allowDuplication'] .= 'name,maxDuplicationRows,notificationTokenTemplates';
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['allowDuplication'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_form_field']['allowDuplication'],
@@ -23,6 +23,14 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['allowDuplication'] = [
     'inputType' => 'checkbox',
     'eval' => ['tl_class' => 'w50 m12', 'submitOnChange' => true],
     'sql' => "char(1) NOT NULL default ''",
+];
+
+$GLOBALS['TL_DCA']['tl_form_field']['fields']['maxDuplicationRows'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_form_field']['maxDuplicationRows'],
+    'exclude' => true,
+    'inputType' => 'text',
+    'eval' => ['rgxp'=>'digit', 'tl_class'=>'w50'],
+    'sql' => "varchar(10) NOT NULL default ''"
 ];
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['notificationTokenTemplates'] = [
