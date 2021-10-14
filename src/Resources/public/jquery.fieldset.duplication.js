@@ -59,10 +59,10 @@
 
             var cloneFieldset = function($fieldset)
             {
-                if ($fieldsets.length >= maxRows)
+                if (maxRows != null && $fieldsets.length >= maxRows)
                 {
                     // trigger event
-                    $(document).trigger('fieldset-clone-rejected', [$fieldset, fieldsets, maxRows]);
+                    $(document).trigger('fieldset-clone-rejected', [$fieldset, $fieldsets, maxRows]);
                     return;
                 }
 
@@ -132,7 +132,7 @@
                 updateFieldsets();
                 
                 // disable the 'add' button if no additional row is allowed
-                if ($fieldsets.length >= maxRows)
+                if (maxRows != null && $fieldsets.length >= maxRows)
                 {
                     $fieldsets.each(function(i, e)
                     {
