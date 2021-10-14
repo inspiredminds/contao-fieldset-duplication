@@ -42,14 +42,14 @@ class FormHookListener implements FrameworkAwareInterface
     public function onLoadFormField(Widget $widget, string $formId, array $data, Form $form): Widget
     {
         if ($this->fieldHelper->isFieldsetStart($widget) && $widget->allowDuplication && false === strpos($widget->name, '_duplicate_')) {
-            $arrClasses = explode(" ", $widget->class);
-            $arrClasses[] = "allow-duplication";
-            $arrClasses[] = "duplicate-fieldset-".$widget->id;
+            $arrClasses = !empty($widget->class) ? explode(' ', $widget->class) : [];
+            $arrClasses[] = 'allow-duplication';
+            $arrClasses[] = 'duplicate-fieldset-'.$widget->id;
             if (!empty($widget->maxDuplicationRows)) {
-              $arrClasses[] = "duplicate-fieldset-maxRows-".$widget->maxDuplicationRows;
+                $arrClasses[] = 'duplicate-fieldset-maxRows-'.$widget->maxDuplicationRows;
             }
             
-            $widget->class = implode(" ", $arrClasses);
+            $widget->class = implode(' ', $arrClasses);
         }
 
         return $widget;
