@@ -28,13 +28,14 @@
     "require":{
         "php": "^7.1 || ^8.0",
         "ext-json": "*",
-        "contao/core-bundle": "^4.4",
+        "contao/core-bundle": "^4.9",
         "composer/semver": "^1.0 || ^2.0 || ^3.0",
         "jean85/pretty-package-versions": "^1.0 || ^2.0",
-        "menatwork/contao-multicolumnwizard-bundle": "^3.4"
+        "mvo/contao-group-widget": "^1.3"
     },
     "require-dev": {
-         "contao/manager-plugin": "^2.0"
+         "contao/manager-plugin": "^2.0",
+         "friendsofphp/php-cs-fixer": "^3.0"
     },
     "autoload": {
         "psr-4": {
@@ -43,5 +44,11 @@
     },
     "extra": {
         "contao-manager-plugin": "InspiredMinds\\ContaoFieldsetDuplication\\ContaoManager\\Plugin"
+    },
+    "config": {
+        "allow-plugins": {
+            "contao-components/installer": true,
+            "contao/manager-plugin": true
+        }
     }
 }

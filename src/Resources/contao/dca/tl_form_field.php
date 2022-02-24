@@ -10,56 +10,51 @@ declare(strict_types=1);
  * @license LGPL-3.0-or-later
  */
 
-use Contao\CoreBundle\DataContainer\PaletteManipulator;
-use Contao\System;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 use InspiredMinds\ContaoFieldsetDuplication\EventListener\FormFieldDcaListener;
 
 $GLOBALS['TL_DCA']['tl_form_field']['palettes']['__selector__'][] = 'allowDuplication';
-$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['allowDuplication'] .= 'name,maxDuplicationRows,notificationTokenTemplates';
+$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['allowDuplication'] .= 'name,maxDuplicationRows,doNotCopyExistingValues,notificationTokenTemplates';
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['allowDuplication'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_form_field']['allowDuplication'],
     'exclude' => true,
     'inputType' => 'checkbox',
-    'eval' => ['tl_class' => 'w50 m12', 'submitOnChange' => true],
+    'eval' => ['tl_class' => 'clr w50', 'submitOnChange' => true],
     'sql' => "char(1) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['maxDuplicationRows'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_form_field']['maxDuplicationRows'],
     'exclude' => true,
     'inputType' => 'text',
-    'eval' => ['rgxp'=>'digit', 'tl_class'=>'w50'],
-    'sql' => "varchar(10) NOT NULL default ''"
+    'eval' => ['rgxp' => 'digit', 'tl_class' => 'w50'],
+    'sql' => "varchar(10) NOT NULL default ''",
+];
+
+$GLOBALS['TL_DCA']['tl_form_field']['fields']['doNotCopyExistingValues'] = [
+    'exclude' => true,
+    'inputType' => 'checkbox',
+    'eval' => ['tl_class' => 'w50'],
+    'sql' => ['type' => 'boolean', 'default' => false],
 ];
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['notificationTokenTemplates'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_form_field']['notificationTokenTemplates'],
     'exclude' => true,
-    'inputType' => 'multiColumnWizard',
-    'options_callback' => [FormFieldDcaListener::class, 'templateOptions'],
-    'eval' => [
-        'tl_class' => 'clr',
-        'columnFields' => [
-            'format' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_form_field']['notificationTokenFormat'],
-                'inputType' => 'text',
-                'eval' => ['style' => 'width: 200px'],
-            ],
-            'template' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_form_field']['notificationTokenFormatTemplate'],
-                'inputType' => 'select',
-                'options_callback' => [FormFieldDcaListener::class, 'templateOptions'],
-                'eval' => ['includeBlankOption' => true, 'chosen' => true, 'style' => 'width:400px'],
-            ],
+    'inputType' => 'group',
+    'palette' => ['format', 'template'],
+    'eval' => ['tl_class' => 'clr'],
+    'fields' => [
+        'format' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_form_field']['notificationTokenFormat'],
+            'inputType' => 'text',
+            'eval' => ['tl_class' => 'w50'],
+        ],
+        'template' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_form_field']['notificationTokenFormatTemplate'],
+            'inputType' => 'select',
+            'options_callback' => [FormFieldDcaListener::class, 'templateOptions'],
+            'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
         ],
     ],
-    'sql' => 'blob NULL',
+    'sql' => ['type' => 'blob', 'length' => MySqlPlatform::LENGTH_LIMIT_BLOB, 'notnull' => false],
 ];
-
-$fieldsetPalette = System::getContainer()->get('inspiredminds.fieldsetduplication.helper.field')->getFieldsetPalette();
-
-PaletteManipulator::create()
-    ->addField('allowDuplication', 'fconfig_legend', PaletteManipulator::POSITION_APPEND)
-    ->applyToPalette($fieldsetPalette, 'tl_form_field')
-;

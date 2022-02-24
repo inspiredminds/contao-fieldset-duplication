@@ -13,21 +13,17 @@ declare(strict_types=1);
 namespace InspiredMinds\ContaoFieldsetDuplication\EventListener;
 
 use Contao\Config;
-use Contao\CoreBundle\Framework\FrameworkAwareInterface;
-use Contao\CoreBundle\Framework\FrameworkAwareTrait;
 use Contao\Database;
 use Contao\Form;
+use Contao\FormFieldModel;
 use Contao\FrontendTemplate;
 use Contao\StringUtil;
 use Contao\Widget;
-use FormFieldModel;
 use InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class FormHookListener implements FrameworkAwareInterface
+class FormHookListener
 {
-    use FrameworkAwareTrait;
-
     public const TABLE_FIELD = 'fieldset_duplicates';
 
     protected $requestStack;
@@ -45,8 +41,13 @@ class FormHookListener implements FrameworkAwareInterface
             $arrClasses = !empty($widget->class) ? explode(' ', $widget->class) : [];
             $arrClasses[] = 'allow-duplication';
             $arrClasses[] = 'duplicate-fieldset-'.$widget->id;
+
             if (!empty($widget->maxDuplicationRows)) {
                 $arrClasses[] = 'duplicate-fieldset-maxRows-'.$widget->maxDuplicationRows;
+            }
+
+            if (!empty($widget->doNotCopyExistingValues)) {
+                $arrClasses[] = 'duplicate-fieldset-donotcopy';
             }
             
             $widget->class = implode(' ', $arrClasses);

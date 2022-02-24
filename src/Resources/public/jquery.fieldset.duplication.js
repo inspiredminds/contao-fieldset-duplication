@@ -107,7 +107,8 @@
                     }
 
                     var value = $input.attr('value');
-                    if ($input.val() && typeof value !== typeof undefined && value !== false && $input.val() !== value) {
+
+                    if ($input.val() && typeof value !== 'undefined' && value !== false && ($input.val() !== value || $fieldset.hasClass('duplicate-fieldset-donotcopy'))) {
                         $input.val('');
                     }
 

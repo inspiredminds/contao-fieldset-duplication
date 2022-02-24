@@ -1,11 +1,7 @@
 services:
   _defaults:
+    autoconfigure: true
     public: true
-
-  _instanceof:
-    Contao\CoreBundle\Framework\FrameworkAwareInterface:
-      calls:
-        - ["setFramework", ["@contao.framework"]]
 
   inspiredminds.fieldsetduplication.listener.formhook:
     class: InspiredMinds\ContaoFieldsetDuplication\EventListener\FormHookListener
@@ -15,7 +11,12 @@ services:
 
   InspiredMinds\ContaoFieldsetDuplication\EventListener\FormFieldDcaListener:
     arguments:
-      - '@contao.framework'
+      - '@inspiredminds.fieldsetduplication.helper.field'
 
   inspiredminds.fieldsetduplication.helper.field:
     class: InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper
+
+  inspiredminds.fieldsetduplication.migration.notificationtokentemplates:
+    class: InspiredMinds\ContaoFieldsetDuplication\Migration\NotificationTokenTemplatesMigration
+    arguments:
+      - '@database_connection'
