@@ -1,4 +1,4 @@
-<?= Contao\Template::generateScriptTag('bundles/contaofieldsetduplication/jquery.fieldset.duplication.js', false, null) ?>
+<?= Contao\Template::generateScriptTag('bundles/contaofieldsetduplication/jquery.fieldset.duplication.min.js', false, null) ?>
 <script>
   (function($){
     $('fieldset.allow-duplication').fieldsetDuplication();
