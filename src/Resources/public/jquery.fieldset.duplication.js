@@ -71,6 +71,8 @@
                 
                 duplicateIndex++;
 
+                const nameMap = {};
+
                 // process input fields
                 $clone.find('input[name], select[name], textarea[name]').each(function() {
                     var $input = $(this);
@@ -104,6 +106,8 @@
                         }
                         var newName = oldName + '_duplicate_' + duplicateIndex;
                         $input.attr('name', newName);
+
+                        nameMap[oldName] = newName;
                     }
 
                     var value = $input.attr('value');
@@ -113,6 +117,17 @@
                     }
 
                     $input.not('[checked]').prop('checked', false);
+                });
+
+                // process cff fieldsets
+                $clone.find('fieldset[data-cff-condition]').each((i, e) => {
+                    let condition = e.dataset.cffCondition;
+
+                    for (const [key, value] of Object.entries(nameMap)) {
+                        condition = condition.replace(key, value);
+                    }
+
+                    e.dataset.cffCondition = condition;
                 });
 
                 // remove some other stuff
