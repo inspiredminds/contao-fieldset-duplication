@@ -112,11 +112,13 @@
 
                     var value = $input.attr('value');
 
-                    if ($input.val() && typeof value !== 'undefined' && value !== false && ($input.val() !== value || $fieldset.hasClass('duplicate-fieldset-donotcopy'))) {
-                        $input.val('');
+                    if ($input.attr('type') !== 'checkbox' && $input.attr('type') !== 'radio' ) {
+                        if ($input.val() && typeof value !== 'undefined' && value !== false && ($input.val() !== value || $fieldset.hasClass('duplicate-fieldset-donotcopy'))) {
+                            $input.val('');
+                        }
+                    } else {
+                        $input.not('[checked]').prop('checked', false);
                     }
-
-                    $input.not('[checked]').prop('checked', false);
                 });
 
                 // process cff fieldsets
