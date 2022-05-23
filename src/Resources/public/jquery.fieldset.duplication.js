@@ -126,7 +126,7 @@
                     let condition = e.dataset.cffCondition;
 
                     for (const [key, value] of Object.entries(nameMap)) {
-                        condition = condition.replace(key, value);
+                        condition = condition.replaceAll(key, value);
                     }
 
                     e.dataset.cffCondition = condition;
