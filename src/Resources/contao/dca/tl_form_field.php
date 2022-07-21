@@ -10,7 +10,6 @@ declare(strict_types=1);
  * @license LGPL-3.0-or-later
  */
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
 use InspiredMinds\ContaoFieldsetDuplication\EventListener\FormFieldDcaListener;
 
 $GLOBALS['TL_DCA']['tl_form_field']['palettes']['__selector__'][] = 'allowDuplication';
@@ -56,5 +55,5 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['notificationTokenTemplates'] = [
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
         ],
     ],
-    'sql' => ['type' => 'blob', 'length' => MySqlPlatform::LENGTH_LIMIT_BLOB, 'notnull' => false],
+    'sql' => ['type' => 'blob', 'length' => 65535, 'notnull' => false],
 ];
