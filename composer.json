@@ -26,9 +26,9 @@
         }
     ],
     "require":{
-        "php": "^7.1 || ^8.0",
+        "php": ">=7.1",
         "ext-json": "*",
-        "contao/core-bundle": "^4.9",
+        "contao/core-bundle": "^4.9 || ^5.0",
         "composer/semver": "^1.0 || ^2.0 || ^3.0",
         "jean85/pretty-package-versions": "^1.0 || ^2.0",
         "mvo/contao-group-widget": "^1.3"

@@ -14,7 +14,7 @@ $GLOBALS['TL_HOOKS']['loadFormField'][] = ['inspiredminds.fieldsetduplication.li
 $GLOBALS['TL_HOOKS']['compileFormFields'][] = ['inspiredminds.fieldsetduplication.listener.formhook', 'onCompileFormFields'];
 $GLOBALS['TL_HOOKS']['prepareFormData'][] = ['inspiredminds.fieldsetduplication.listener.formhook', 'onPrepareFormData'];
 
-if (!\is_array($GLOBALS['TL_HOOKS']['storeFormData'])) {
+if (!isset($GLOBALS['TL_HOOKS']['storeFormData'])) {
     $GLOBALS['TL_HOOKS']['storeFormData'] = [];
 }
 array_unshift($GLOBALS['TL_HOOKS']['storeFormData'], ['inspiredminds.fieldsetduplication.listener.formhook', 'onStoreFormData']);
