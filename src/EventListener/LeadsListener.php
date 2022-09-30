@@ -1,5 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the inspiredminds/contao-fieldset-duplication package.
+ *
+ * (c) inspiredminds
+ *
+ * @license LGPL-3.0-or-later
+ */
+
 namespace InspiredMinds\ContaoFieldsetDuplication\EventListener;
 
 use Contao\CoreBundle\ServiceAnnotation\Hook;
@@ -24,7 +34,7 @@ class LeadsListener
      */
     public function onLoadDataContainer(string $table): void
     {
-        if ($table === 'tl_lead_data') {
+        if ('tl_lead_data' === $table) {
             $GLOBALS['TL_DCA']['tl_lead_data']['fields']['fieldset_data'] = [
                 'sql' => ['type' => 'blob', 'notnull' => false],
             ];
@@ -64,7 +74,7 @@ class LeadsListener
                 }
             }
 
-            if (count($fieldsetFields) > 0) {
+            if (\count($fieldsetFields) > 0) {
                 $this->connection->insert('tl_lead_data', [
                     'pid' => $intLead,
                     'sorting' => $fieldset['fieldset']['sorting'],
@@ -89,7 +99,7 @@ class LeadsListener
     {
         static $duplicateFields = null;
 
-        if (!is_array($duplicateFields)) {
+        if (!\is_array($duplicateFields)) {
             $duplicateFields = [];
             $fieldsetGroup = null;
 
@@ -110,7 +120,7 @@ class LeadsListener
                     continue;
                 }
 
-                if ($fieldsetGroup !== null) {
+                if (null !== $fieldsetGroup) {
                     $duplicateFields[$fieldsetGroup]['fields'][] = $field;
                 }
             }
