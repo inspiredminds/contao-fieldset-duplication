@@ -13,7 +13,7 @@ declare(strict_types=1);
 use InspiredMinds\ContaoFieldsetDuplication\EventListener\FormFieldDcaListener;
 
 $GLOBALS['TL_DCA']['tl_form_field']['palettes']['__selector__'][] = 'allowDuplication';
-$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['allowDuplication'] = 'name,maxDuplicationRows,doNotCopyExistingValues,notificationTokenTemplates';
+$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['allowDuplication'] = 'name,maxDuplicationRows,doNotCopyExistingValues,notificationTokenTemplates,leadStore';
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['allowDuplication'] = [
     'exclude' => true,
