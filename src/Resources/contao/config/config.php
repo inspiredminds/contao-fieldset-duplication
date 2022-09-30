@@ -18,8 +18,3 @@ if (!isset($GLOBALS['TL_HOOKS']['storeFormData'])) {
     $GLOBALS['TL_HOOKS']['storeFormData'] = [];
 }
 array_unshift($GLOBALS['TL_HOOKS']['storeFormData'], ['inspiredminds.fieldsetduplication.listener.formhook', 'onStoreFormData']);
-
-// Add Leads support
-if (class_exists(\Leads\Leads::class)) {
-    $GLOBALS['TL_HOOKS']['storeLeadsData'][] = [\InspiredMinds\ContaoFieldsetDuplication\EventListener\LeadsListener::class, 'onStoreLeadsData'];
-}

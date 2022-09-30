@@ -2,6 +2,7 @@
 
 namespace InspiredMinds\ContaoFieldsetDuplication\EventListener;
 
+use Contao\CoreBundle\ServiceAnnotation\Hook;
 use Contao\Database\Result;
 use Doctrine\DBAL\Connection;
 use Haste\Util\Format;
@@ -15,6 +16,21 @@ class LeadsListener
         $this->connection = $connection;
     }
 
+    /**
+     * @Hook("loadDataContainer")
+     */
+    public function onLoadDataContainer(string $table): void
+    {
+        if ($table === 'tl_lead_data') {
+            $GLOBALS['TL_DCA']['tl_lead_data']['fields']['fieldset_data'] = [
+                'sql' => ['type' => 'blob', 'notnull' => false],
+            ];
+        }
+    }
+
+    /**
+     * @Hook("storeLeadsData")
+     */
     public function onStoreLeadsData(array $arrPost, array $arrForm, array $arrFiles = null, int $intLead, Result $objFields): void
     {
         $time = time();
