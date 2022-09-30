@@ -104,7 +104,7 @@ class LeadsListener
             $fieldsetGroup = null;
 
             foreach ($allFields as $field) {
-                if ($this->fieldHelper->isFieldsetStart($field) && $field['allowDuplication']) {
+                if ($this->fieldHelper->isFieldsetStart($field) && $field['allowDuplication'] && $field['leadStore']) {
                     $fieldsetGroup = $field['name'];
 
                     $duplicateFields[$fieldsetGroup] = [
