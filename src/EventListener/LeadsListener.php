@@ -6,14 +6,17 @@ use Contao\CoreBundle\ServiceAnnotation\Hook;
 use Contao\Database\Result;
 use Doctrine\DBAL\Connection;
 use Haste\Util\Format;
+use InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper;
 
 class LeadsListener
 {
     private Connection $connection;
+    private FieldHelper $fieldHelper;
 
-    public function __construct(Connection $connection)
+    public function __construct(Connection $connection, FieldHelper $fieldHelper)
     {
         $this->connection = $connection;
+        $this->fieldHelper = $fieldHelper;
     }
 
     /**
@@ -91,7 +94,7 @@ class LeadsListener
             $fieldsetGroup = null;
 
             foreach ($allFields as $field) {
-                if ($field['type'] === 'fieldsetStart' && $field['allowDuplication']) {
+                if ($this->fieldHelper->isFieldsetStart($field) && $field['allowDuplication']) {
                     $fieldsetGroup = $field['name'];
 
                     $duplicateFields[$fieldsetGroup] = [
@@ -102,7 +105,7 @@ class LeadsListener
                     continue;
                 }
 
-                if ($field['type'] === 'fieldsetStop') {
+                if ($this->fieldHelper->isFieldsetStop($field)) {
                     $fieldsetGroup = null;
                     continue;
                 }
