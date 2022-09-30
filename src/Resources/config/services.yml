@@ -16,6 +16,7 @@ services:
   InspiredMinds\ContaoFieldsetDuplication\EventListener\LeadsListener:
     arguments:
       - '@database_connection'
+      - '@inspiredminds.fieldsetduplication.helper.field'
 
   inspiredminds.fieldsetduplication.helper.field:
     class: InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper
