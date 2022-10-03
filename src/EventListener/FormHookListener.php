@@ -81,7 +81,7 @@ class FormHookListener
         }
 
         // check if form was submitted
-        if ($submittedData['FORM_SUBMIT'] === $formId) {
+        if (($submittedData['FORM_SUBMIT'] ?? null) === $formId) {
             $fieldsetGroups = $this->buildFieldsetGroups($fields);
 
             $processed = [];
