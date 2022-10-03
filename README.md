@@ -21,7 +21,9 @@ The following options can be changed:
       /* text content of the add button */
       buttonAdd: '+',
       /* text content of the remove button */
-      buttonRemove: '&times;'
+      buttonRemove: '&times;',
+      /* a custom widget CSS selector */
+      widgetSelector: '.form-widget', // defaults to .widget
     });
   })(jQuery);
 </script>
