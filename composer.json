@@ -36,7 +36,8 @@
     "require-dev": {
          "contao/manager-plugin": "^2.0",
          "friendsofphp/php-cs-fixer": "^3.0",
-         "terminal42/contao-leads": "^1.4"
+         "terminal42/contao-leads": "^1.4",
+        "terminal42/contao-mp_forms": "^4.4"
     },
     "autoload": {
         "psr-4": {
