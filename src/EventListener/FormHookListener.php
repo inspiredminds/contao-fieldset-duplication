@@ -133,9 +133,6 @@ class FormHookListener
                                     // set the name
                                     $clone->name = $duplicateName;
 
-                                    // set the label
-                                    $clone->label = $clone->label.' '.$duplicateNumber;
-
                                     // set the sorting
                                     $clone->sorting = ++$sorting;
 
