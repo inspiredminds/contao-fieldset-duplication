@@ -20,6 +20,7 @@ use Contao\FrontendTemplate;
 use Contao\StringUtil;
 use Contao\Widget;
 use InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper;
+use MPFormsFormManager;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class FormHookListener
@@ -49,7 +50,7 @@ class FormHookListener
             if (!empty($widget->doNotCopyExistingValues)) {
                 $arrClasses[] = 'duplicate-fieldset-donotcopy';
             }
-            
+
             $widget->class = implode(' ', $arrClasses);
         }
 
@@ -58,18 +59,36 @@ class FormHookListener
 
     public function onCompileFormFields(array $fields, $formId, Form $objForm): array
     {
-        // get the current request
-        $request = $this->requestStack->getCurrentRequest();
+        static $alreadyProcessed = false;
+
+        // Ensure the listener is called only once (e.g. in combination with MPForms)
+        if ($alreadyProcessed) {
+            return $fields;
+        }
+
+        $alreadyProcessed = true;
+        $submittedData = [];
+
+        // Get the submitted data from the request
+        if (($request = $this->requestStack->getCurrentRequest()) !== null) {
+            $submittedData = $request->request->all();
+        }
+
+        // Get the submitted data from MPForms
+        if (count($submittedData) === 0 && class_exists(\MPFormsFormManager::class)) {
+            $manager = new MPFormsFormManager($objForm->id);
+            $submittedData = $manager->getDataOfStep($manager->getCurrentStep())['originalPostData'] ?? [];
+        }
 
         // check if form was submitted
-        if ($request->request->get('FORM_SUBMIT') === $formId) {
+        if (($submittedData['FORM_SUBMIT'] ?? null) === $formId) {
             $fieldsetGroups = $this->buildFieldsetGroups($fields);
 
             $processed = [];
             $fieldsetDuplicates = [];
 
             // search for duplicates
-            foreach (array_keys($request->request->all()) as $duplicateName) {
+            foreach (array_keys($submittedData) as $duplicateName) {
                 // check if already processed
                 if (\in_array($duplicateName, $processed, true)) {
                     continue;
@@ -113,9 +132,6 @@ class FormHookListener
 
                                     // set the name
                                     $clone->name = $duplicateName;
-
-                                    // set the label
-                                    $clone->label = $clone->label.' '.$duplicateNumber;
 
                                     // set the sorting
                                     $clone->sorting = ++$sorting;
