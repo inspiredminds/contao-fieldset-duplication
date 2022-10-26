@@ -10,7 +10,6 @@
             buttonRemove: '&times;',
             widgetSelector: '.widget',
         };
-        var options  = $.extend({}, defaults, settings);
 
         $(this).each(function(i, e)
         {
@@ -19,6 +18,7 @@
             var selector = null;
             var maxRows = null;
             var duplicateIndex = 0;
+            var options = $.extend({}, defaults, settings, $original.data('fieldset-duplication-config') || {})
 
             // determine the fieldset group selector
             var classList = $original.attr('class').split(/\s+/);
