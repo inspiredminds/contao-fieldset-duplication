@@ -111,10 +111,8 @@
                         nameMap[oldName] = newName;
                     }
 
-                    var value = $input.attr('value');
-
                     if ($input.attr('type') !== 'checkbox' && $input.attr('type') !== 'radio' ) {
-                        if ($input.val() && typeof value !== 'undefined' && value !== false && ($input.val() !== value || $fieldset.hasClass('duplicate-fieldset-donotcopy'))) {
+                        if ($input.val() && $fieldset.hasClass('duplicate-fieldset-donotcopy')) {
                             $input.val('');
                         }
                     } else {
