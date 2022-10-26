@@ -1,4 +1,5 @@
 <?php
+
 $config = [];
 
 if ($this->labelButtonAdd) {
@@ -8,6 +9,7 @@ if ($this->labelButtonAdd) {
 if ($this->labelButtonRemove) {
     $config['buttonRemove'] = $this->labelButtonRemove;
 }
+
 ?>
 
 <fieldset<?php if ($this->class): ?> class="<?= $this->class ?>"<?php endif; ?><?php if (count($config) > 0): ?> data-fieldset-duplication-config="<?= \Contao\StringUtil::specialchars(json_encode($config)) ?>"<?php endif; ?>>
