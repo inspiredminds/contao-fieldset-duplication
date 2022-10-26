@@ -13,7 +13,7 @@ declare(strict_types=1);
 use InspiredMinds\ContaoFieldsetDuplication\EventListener\FormFieldDcaListener;
 
 $GLOBALS['TL_DCA']['tl_form_field']['palettes']['__selector__'][] = 'allowDuplication';
-$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['allowDuplication'] = 'name,maxDuplicationRows,doNotCopyExistingValues,notificationTokenTemplates,leadStore';
+$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['allowDuplication'] = 'name,maxDuplicationRows,labelButtonAdd,labelButtonRemove,doNotCopyExistingValues,notificationTokenTemplates,leadStore';
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['allowDuplication'] = [
     'exclude' => true,
@@ -27,6 +27,20 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['maxDuplicationRows'] = [
     'inputType' => 'text',
     'eval' => ['rgxp' => 'digit', 'tl_class' => 'w50'],
     'sql' => "varchar(10) NOT NULL default ''",
+];
+
+$GLOBALS['TL_DCA']['tl_form_field']['fields']['labelButtonAdd'] = [
+    'exclude' => true,
+    'inputType' => 'text',
+    'eval' => ['maxlength' => 64, 'tl_class' => 'w50'],
+    'sql' => "varchar(64) NOT NULL default ''",
+];
+
+$GLOBALS['TL_DCA']['tl_form_field']['fields']['labelButtonRemove'] = [
+    'exclude' => true,
+    'inputType' => 'text',
+    'eval' => ['maxlength' => 64, 'tl_class' => 'w50'],
+    'sql' => "varchar(64) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['doNotCopyExistingValues'] = [
