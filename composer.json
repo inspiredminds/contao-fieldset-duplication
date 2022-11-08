@@ -30,6 +30,7 @@
         "ext-json": "*",
         "contao/core-bundle": "^4.9 || ^5.0",
         "composer/semver": "^1.0 || ^2.0 || ^3.0",
+        "doctrine/dbal": "^2.11 || ^3.0",
         "jean85/pretty-package-versions": "^1.0 || ^2.0",
         "mvo/contao-group-widget": "^1.3"
     },
