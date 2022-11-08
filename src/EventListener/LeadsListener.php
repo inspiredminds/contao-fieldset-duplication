@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace InspiredMinds\ContaoFieldsetDuplication\EventListener;
 
 use Contao\CoreBundle\ServiceAnnotation\Hook;
-use Contao\Database\Result;
 use Doctrine\DBAL\Connection;
 use Haste\Util\Format;
 use InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper;
@@ -44,11 +43,25 @@ class LeadsListener
     /**
      * @Hook("storeLeadsData")
      */
-    public function onStoreLeadsData(array $arrPost, array $arrForm, array $arrFiles = null, int $intLead, Result $objFields): void
+    public function onStoreLeadsData(array $arrPost, array $form, array $arrFiles = null, int $intLead): void
     {
+        // Fetch master form fields
+        if ($form['leadMaster'] > 0) {
+            $leadFields = $this->connection->fetchAllAssociative(
+                "SELECT f2.*, f1.id AS master_id, f1.name AS postName FROM tl_form_field f1 LEFT JOIN tl_form_field f2 ON f1.leadStore=f2.id WHERE f1.pid=? AND f1.leadStore>0 AND (f2.leadStore=? OR f2.type=? OR f2.type=?) AND f1.invisible=? ORDER BY f2.sorting",
+                [$form['id'], 1, 'fieldsetStart', 'fieldsetStop', '']
+            );
+        } else {
+            $leadFields = $this->connection->fetchAllAssociative(
+                "SELECT *, id AS master_id, name AS postName FROM tl_form_field WHERE pid=? AND (leadStore=? OR type=? OR type=?) AND invisible=? ORDER BY sorting",
+                [$form['id'], 1, 'fieldsetStart', 'fieldsetStop', '']
+            );
+        }
+
+
         $time = time();
 
-        foreach ($this->getDuplicateFields($objFields->fetchAllAssoc()) as $fieldset) {
+        foreach ($this->getDuplicateFields($leadFields) as $fieldset) {
             $fieldsetFields = [];
 
             // Collect the fields
