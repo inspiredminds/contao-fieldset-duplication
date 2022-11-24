@@ -30,7 +30,7 @@ class Plugin implements BundlePluginInterface
     {
         return [
             BundleConfig::create(ContaoFieldsetDuplication::class)
-                ->setLoadAfter([ContaoCoreBundle::class, 'conditionalformfields', 'leads', 'mp_forms']),
+                ->setLoadAfter([ContaoCoreBundle::class, 'conditionalformfields', 'leads']),
         ];
     }
 }
