@@ -19,7 +19,7 @@
             var maxRows = null;
             var duplicateIndex = 0;
             var options = $.extend({}, defaults, settings, $original.data('fieldset-duplication-config') || {})
-
+            
             // determine the fieldset group selector
             var classList = $original.attr('class').split(/\s+/);
             $.each(classList, function(index, item)
@@ -39,7 +39,17 @@
                     return false;
                 }
             });
-
+            // determine the highest existing duplicate number 
+            $(selector).each(function()
+            {
+                $(this).find('input[name], select[name], textarea[name]').each(function() {
+                    var match = $(this).attr('id').match(/_duplicate_(\d+)/);
+                    if (match && match[1] > duplicateIndex) {
+                        duplicateIndex = match[1];
+                    }
+                });
+            });
+            
             var updateFieldsets = function()
             {
                 $fieldsets = $(selector);
