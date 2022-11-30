@@ -39,7 +39,17 @@
                     return false;
                 }
             });
-
+            // determine the highest existing duplicate number 
+            $(selector).each(function()
+            {
+                $(this).find('input[name], select[name], textarea[name]').each(function() {
+                    var match = $(this).attr('id').match(/_duplicate_(\d+)/);
+                    if (match && match[1] > duplicateIndex) {
+                        duplicateIndex = match[1];
+                    }
+                });
+            });
+            
             var updateFieldsets = function()
             {
                 $fieldsets = $(selector);
