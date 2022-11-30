@@ -21,6 +21,7 @@ use Contao\StringUtil;
 use Contao\Widget;
 use InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper;
 use MPFormsFormManager;
+use MPFormsSessionManager;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class FormHookListener
@@ -59,14 +60,13 @@ class FormHookListener
 
     public function onCompileFormFields(array $fields, $formId, Form $objForm): array
     {
-        static $alreadyProcessed = false;
-
-        // Ensure the listener is called only once (e.g. in combination with MPForms)
-        if ($alreadyProcessed) {
-            return $fields;
+        // Return if the fields were already cloned by this listener (e.g. in combination with MPForms)
+        foreach ($fields as $field) {
+            if (false !== (strpos($field->name, '_duplicate_'))) {
+                return $fields;
+            }
         }
 
-        $alreadyProcessed = true;
         $submittedData = [];
 
         // Get the submitted data from the request
@@ -75,8 +75,8 @@ class FormHookListener
         }
 
         // Get the submitted data from MPForms
-        if (count($submittedData) === 0 && class_exists(\MPFormsFormManager::class)) {
-            $manager = new MPFormsFormManager($objForm->id);
+        if (count($submittedData) === 0 && class_exists(\MPFormsSessionManager::class)) {
+            $manager = new MPFormsSessionManager($objForm->id);
             $submittedData = $manager->getDataOfStep($manager->getCurrentStep())['originalPostData'] ?? [];
         }
 
