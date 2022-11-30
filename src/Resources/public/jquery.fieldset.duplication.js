@@ -19,7 +19,7 @@
             var maxRows = null;
             var duplicateIndex = 0;
             var options = $.extend({}, defaults, settings, $original.data('fieldset-duplication-config') || {})
-            
+
             // determine the fieldset group selector
             var classList = $original.attr('class').split(/\s+/);
             $.each(classList, function(index, item)
