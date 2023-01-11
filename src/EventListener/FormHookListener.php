@@ -120,7 +120,7 @@ class FormHookListener
 
                                     // remove allow duplication class
                                     if ($this->fieldHelper->isFieldsetStart($clone)) {
-                                        $clone->class = implode(' ', array_diff(explode(' ', $clone->class), ['allow-duplication']));
+                                        $clone->class = implode(' ', array_diff(explode(' ', $clone->class ?? ''), ['allow-duplication']));
                                         $clone->class .= ($clone->class ? ' ' : '').'duplicate-fieldset-'.$field->id.' duplicate';
                                     }
 
