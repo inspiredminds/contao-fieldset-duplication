@@ -41,9 +41,6 @@
          "terminal42/contao-leads": "^3.0",
          "terminal42/contao-mp_forms": "^5.0"
     },
-    "conflict": {
-        "terminal42/contao-mp_forms": "<5.0"
-    },
     "autoload": {
         "psr-4": {
             "InspiredMinds\\ContaoFieldsetDuplication\\": "src/"
