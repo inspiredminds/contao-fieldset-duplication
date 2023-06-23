@@ -257,6 +257,9 @@ class FormHookListener
         // field set groups
         $fieldsetGroups = [];
 
+        // fielset group stack
+        $fieldsetGroupStack = [];
+
         // field set group
         $fieldsetGroup = [];
 
@@ -264,11 +267,25 @@ class FormHookListener
         foreach ($fields as $field) {
             // check if we can process duplicates
             if ($this->fieldHelper->isFieldsetStart($field)) {
+                // check if nested fieldsets are detected and ensure fields are collected
+                if ($fieldsetGroupStack !== []) {
+                    $fieldsetGroups[$fieldsetGroup[0]->id] = $fieldsetGroup;
+                    $fieldsetGroup = [];
+                }
+
                 $fieldsetGroup[] = $field;
+                $fieldsetGroupStack[] = $field->id;
             } elseif ($this->fieldHelper->isFieldsetStop($field)) {
+                $groupId = \array_pop($fieldsetGroupStack);
                 $fieldsetGroup[] = $field;
-                $fieldsetGroups[$fieldsetGroup[0]->id] = $fieldsetGroup;
-                $fieldsetGroup = [];
+                $fieldsetGroups[$groupId] = $fieldsetGroup;
+
+                // Check if nested fieldset are used and restore the out fieldset group
+                if ($fieldsetGroupStack) {
+                    $fieldsetGroup = $fieldsetGroups[\current($fieldsetGroupStack)];
+                } else {
+                    $fieldsetGroup = [];
+                }
             } elseif (!empty($fieldsetGroup)) {
                 $fieldsetGroup[] = $field;
             }
