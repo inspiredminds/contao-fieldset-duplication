@@ -101,11 +101,18 @@
 
                     var oldName = $input.attr('name');
                     if (typeof oldName !== 'undefined') {
+                        var isArray = oldName.endsWith('[]');
+                        if (isArray) {
+                            oldName = oldName.substring(0, oldName.length - 2);
+                        }
                         var isDuplicate = oldName.indexOf('_duplicate_');
                         if (isDuplicate >= 0) {
                             oldName = oldName.substr(0, isDuplicate);
                         }
                         var newName = oldName + '_duplicate_' + duplicateIndex;
+                        if (isArray) {
+                            newName += '[]';
+                        }
                         $input.attr('name', newName);
 
                         nameMap[oldName] = newName;
