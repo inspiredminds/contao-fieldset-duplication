@@ -30,6 +30,7 @@
                     return false;
                 }
             });
+
             // determine the max rows configuration
             $.each(classList, function(index, item)
             {
@@ -39,6 +40,13 @@
                     return false;
                 }
             });
+
+            // determine the current duplicate index
+            const lastDuplicateField = Array.from(document.querySelectorAll(selector+' [name*="_duplicate_"]')).pop();
+            
+            if (lastDuplicateField) {
+                duplicateIndex = parseInt(lastDuplicateField.getAttribute('name').slice(-1), 10);
+            }
 
             var updateFieldsets = function()
             {
