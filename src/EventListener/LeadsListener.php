@@ -65,7 +65,7 @@ class LeadsListener implements ServiceSubscriberInterface
             ->executeQuery()->fetchOne();
 
         if (false !== $result) {
-            $this->storeDublicateFields($formConfig, $postData, $result, 3);
+            $this->storeDuplicateFields($formConfig, $postData, $result, 3);
         }
     }
 
@@ -74,10 +74,10 @@ class LeadsListener implements ServiceSubscriberInterface
      */
     public function onStoreLeadsData(array $arrPost, array $form, array $arrFiles = null, int $intLead): void
     {
-        $this->storeDublicateFields($form, $arrPost, $intLead);
+        $this->storeDuplicateFields($form, $arrPost, $intLead);
     }
 
-    private function storeDublicateFields(array $form, array $postData, int $leadId, int $leadsVersion = 1): void
+    private function storeDuplicateFields(array $form, array $postData, int $leadId, int $leadsVersion = 1): void
     {
         $mainIdFieldName = 'master_id';
         $mainFieldName = 'leadMaster';
