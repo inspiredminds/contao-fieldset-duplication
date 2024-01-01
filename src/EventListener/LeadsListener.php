@@ -77,7 +77,7 @@ class LeadsListener implements ServiceSubscriberInterface
         $this->storeDublicateFields($form, $arrPost, $intLead);
     }
 
-    private function storeDublicateFields(array $form, array $postData, int $leadId, int $leadsVersion = 1)
+    private function storeDublicateFields(array $form, array $postData, int $leadId, int $leadsVersion = 1): void
     {
         $mainIdFieldName = 'master_id';
         $mainFieldName = 'leadMaster';
@@ -158,10 +158,9 @@ class LeadsListener implements ServiceSubscriberInterface
                 $this->connection->delete('tl_lead_data', ['pid' => $leadId, 'name' => $field['name']]);
             }
         }
-        return $matches;
     }
 
-    public function getDuplicateFields(array $allFields): void
+    public function getDuplicateFields(array $allFields): array
     {
         static $duplicateFields = null;
 
@@ -191,6 +190,8 @@ class LeadsListener implements ServiceSubscriberInterface
                 }
             }
         }
+
+        return $duplicateFields;
     }
 
     public static function getSubscribedServices()
