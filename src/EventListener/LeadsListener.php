@@ -77,47 +77,6 @@ class LeadsListener implements ServiceSubscriberInterface
         $this->storeDublicateFields($form, $arrPost, $intLead);
     }
 
-    public function getDuplicateFields(array $allFields): array
-    {
-        static $duplicateFields = null;
-
-        if (!\is_array($duplicateFields)) {
-            $duplicateFields = [];
-            $fieldsetGroup = null;
-
-            foreach ($allFields as $field) {
-                if ($this->fieldHelper->isFieldsetStart((object) $field) && $field['allowDuplication'] && $field['leadStore']) {
-                    $fieldsetGroup = $field['name'];
-
-                    $duplicateFields[$fieldsetGroup] = [
-                        'fieldset' => $field,
-                        'fields' => [],
-                    ];
-
-                    continue;
-                }
-
-                if ($this->fieldHelper->isFieldsetStop((object) $field)) {
-                    $fieldsetGroup = null;
-                    continue;
-                }
-
-                if (null !== $fieldsetGroup) {
-                    $duplicateFields[$fieldsetGroup]['fields'][] = $field;
-                }
-            }
-        }
-
-        return $duplicateFields;
-    }
-
-    public static function getSubscribedServices()
-    {
-        return [
-            '?'.Formatter::class,
-        ];
-    }
-
     private function storeDublicateFields(array $form, array $postData, int $leadId, int $leadsVersion = 1)
     {
         $mainIdFieldName = 'master_id';
@@ -200,5 +159,44 @@ class LeadsListener implements ServiceSubscriberInterface
             }
         }
         return $matches;
+    }
+
+    public function getDuplicateFields(array $allFields): void
+    {
+        static $duplicateFields = null;
+
+        if (!\is_array($duplicateFields)) {
+            $duplicateFields = [];
+            $fieldsetGroup = null;
+
+            foreach ($allFields as $field) {
+                if ($this->fieldHelper->isFieldsetStart((object) $field) && $field['allowDuplication'] && $field['leadStore']) {
+                    $fieldsetGroup = $field['name'];
+
+                    $duplicateFields[$fieldsetGroup] = [
+                        'fieldset' => $field,
+                        'fields' => [],
+                    ];
+
+                    continue;
+                }
+
+                if ($this->fieldHelper->isFieldsetStop((object) $field)) {
+                    $fieldsetGroup = null;
+                    continue;
+                }
+
+                if (null !== $fieldsetGroup) {
+                    $duplicateFields[$fieldsetGroup]['fields'][] = $field;
+                }
+            }
+        }
+    }
+
+    public static function getSubscribedServices()
+    {
+        return [
+            '?'.Formatter::class,
+        ];
     }
 }
