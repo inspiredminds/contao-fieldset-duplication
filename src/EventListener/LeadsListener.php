@@ -195,8 +195,12 @@ class LeadsListener implements ServiceSubscriberInterface
 
     public static function getSubscribedServices()
     {
-        return [
-            '?'.Formatter::class,
-        ];
+        $services = [];
+
+        if (class_exists(Formatter::class)) {
+            $services[Formatter::class] = '?'.Formatter::class;
+        }
+
+        return $services;
     }
 }
