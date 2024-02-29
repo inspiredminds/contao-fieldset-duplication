@@ -100,7 +100,7 @@ class FormHookListener
                     $originalName = substr($duplicateName, 0, $intPos);
 
                     // get the duplicate number
-                    $duplicateNumber = (int) (substr($duplicateName, -1));
+                    $duplicateNumber = (int) end(preg_match_all('!\d+!', $duplicateName, $matches));
 
                     // clone the fieldset
                     foreach ($fieldsetGroups as $fieldsetGroup) {
