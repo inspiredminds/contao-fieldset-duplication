@@ -194,7 +194,7 @@ class LeadsListener implements ServiceSubscriberInterface
         return $duplicateFields;
     }
 
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         $services = [];
 
