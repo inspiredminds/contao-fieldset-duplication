@@ -9,29 +9,36 @@ the user for additional input fields.
 
 ![Example screenshot of the front end](https://raw.githubusercontent.com/inspiredminds/contao-fieldset-duplication/master/example.png)
 
-You need to enable the `j_fieldset_duplication` template in your page layout. 
+You need to enable the `js_fieldset_duplication` template in your page layout. 
 The following options can be changed:
 ```html
-<script src="bundles/contaofieldsetduplication/jquery.fieldset.duplication.min.js"></script>
+<?= Contao\Template::generateScriptTag('bundles/contaofieldsetduplication/js.fieldset.duplication.js', false, null) ?>
 <script>
-  (function($){
-    $('fieldset.allow-duplication').fieldsetDuplication({
-      /* when true, prepends the button wrapper within the fieldset, instead of appending */
-      prepend: false,
-      /* text content of the add button */
-      buttonAdd: '+',
-      /* text content of the remove button */
-      buttonRemove: '&times;',
-      /* a custom widget CSS selector */
-      widgetSelector: '.form-widget', // defaults to .widget
+  document.addEventListener('DOMContentLoaded', function() {
+    var elements = document.querySelectorAll('fieldset.allow-duplication');
+
+    elements.forEach(function(element) {
+      fieldsetDuplication(element, {
+        /* when true, prepends the button wrapper within the fieldset, instead of appending */
+        prepend: false,
+        /* text content of the add button */
+        buttonAdd: '+',
+        /* text content of the remove button */
+        buttonRemove: '&times;',
+        /* a custom widget CSS selector */
+        widgetSelector: '.form-widget', // defaults to .widget
+      });
     });
-  })(jQuery);
+  });
 </script>
 ```
 If you want to store the additional data in your database table (using the form 
 generator's ability to store the data in the database), you need to add a column 
 called `fieldset_duplicates` to your target table. This column will then contain 
 the additionally submitted fields in a JSON encoded object.
+
+__Note:__ version `2.1.0` introduced the `js_fieldset_duplication` template. There also exists a jQuery version
+under the name `j_fieldset_duplication`. Make sure to _not_ enable both these templates.
 
 Notification tokens
 -------------------
