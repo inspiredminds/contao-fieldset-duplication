@@ -12,7 +12,7 @@ the user for additional input fields.
 You need to enable the `js_fieldset_duplication` template in your page layout. 
 The following options can be changed:
 ```html
-<?= Contao\Template::generateScriptTag('bundles/contaofieldsetduplication/js.fieldset.duplication.js', false, null) ?>
+<?= Contao\Template::generateScriptTag('bundles/contaofieldsetduplication/js.fieldset.duplication.min.js', false, null) ?>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     var elements = document.querySelectorAll('fieldset.allow-duplication');
