@@ -9,7 +9,7 @@
             widgetSelector: '.widget',
         };
 
-        var options = Object.assign({}, defaults, settings, JSON.parse(element.dataset.fieldsetDuplicationConfig) || {});
+        var options = Object.assign({}, defaults, settings, JSON.parse(element.dataset.fieldsetDuplicationConfig || '{}'));
     
         var original = element;
         var fieldsets = null;
@@ -81,18 +81,18 @@
                     }
                     var newId = oldId + '_duplicate_' + duplicateIndex;
 
-                    // Suche das nächste Elternelement, das dem Selektor entspricht
-                    var closestFieldset = closest(input, options.widgetSelector);
+                    // Search for the widget parent
+                    var closestFieldset = input.closest(options.widgetSelector);
 
-                    // Finde alle Labels innerhalb des gefundenen Elternelements
+                    // Search for all labels within the widget
                     var labels = closestFieldset.querySelectorAll('label[for="'+ input.id +'"]');
 
-                    // Iteriere über jedes gefundene Label
+                    // Iterate over each label
                     labels.forEach(function(label) {
-                        // Setze das 'for'-Attribut des Labels auf die neue ID
+                        // Set the `for` attribute to the new ID
                         label.setAttribute('for', newId);
 
-                        // Überprüfe, ob das Label ein 'id'-Attribut hat, und aktualisiere es gegebenenfalls
+                        // Check if the label has an ID attribute and update it
                         if (typeof label.id !== 'undefined') {
                             label.id = label.id + '_duplicate_' + duplicateIndex;
                         }
@@ -233,13 +233,6 @@
 
             // Set the button actions
             buttonActions(fieldset);
-        }
-
-        function closest(element, selector) {
-            while (element && !element.matches(selector)) {
-                element = element.parentElement;
-            }
-            return element;
         }
 
         // Update the fieldset list
