@@ -17,6 +17,7 @@ use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use InspiredMinds\ContaoFieldsetDuplication\ContaoFieldsetDuplication;
+use Terminal42\LeadsBundle\Terminal42LeadsBundle;
 
 /**
  * Plugin for the Contao Manager.
@@ -28,9 +29,15 @@ class Plugin implements BundlePluginInterface
      */
     public function getBundles(ParserInterface $parser)
     {
+        $loadAfter = [ContaoCoreBundle::class, 'conditionalformfields', 'leads'];
+
+        if (class_exists(Terminal42LeadsBundle::class)) {
+            $loadAfter[] = Terminal42LeadsBundle::class;
+        }
+
         return [
             BundleConfig::create(ContaoFieldsetDuplication::class)
-                ->setLoadAfter([ContaoCoreBundle::class, 'conditionalformfields', 'leads']),
+                ->setLoadAfter($loadAfter),
         ];
     }
 }

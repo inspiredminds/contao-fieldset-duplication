@@ -32,7 +32,8 @@
         "composer/semver": "^1.0 || ^2.0 || ^3.0",
         "doctrine/dbal": "^2.11 || ^3.0",
         "jean85/pretty-package-versions": "^1.0 || ^2.0",
-        "mvo/contao-group-widget": "^1.3"
+        "mvo/contao-group-widget": "^1.3",
+        "symfony/service-contracts": "^1.0 || ^2.0 || ^3.0"
     },
     "require-dev": {
          "contao/manager-plugin": "^2.0",
