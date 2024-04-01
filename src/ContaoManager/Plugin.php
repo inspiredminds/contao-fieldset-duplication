@@ -29,15 +29,13 @@ class Plugin implements BundlePluginInterface
      */
     public function getBundles(ParserInterface $parser)
     {
-        $loadAfter = [ContaoCoreBundle::class, 'conditionalformfields', 'leads'];
-
-        if (class_exists(Terminal42LeadsBundle::class)) {
-            $loadAfter[] = Terminal42LeadsBundle::class;
-        }
-
         return [
-            BundleConfig::create(ContaoFieldsetDuplication::class)
-                ->setLoadAfter($loadAfter),
+            BundleConfig::create(ContaoFieldsetDuplication::class)->setLoadAfter([
+                ContaoCoreBundle::class,
+                'conditionalformfields',
+                'leads',
+                Terminal42LeadsBundle::class
+            ]),
         ];
     }
 }
