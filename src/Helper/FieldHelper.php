@@ -41,7 +41,7 @@ class FieldHelper
 
     public function getFieldsetType($field): ?string
     {
-        if (!\is_string($field->type) || false === strpos($field->type, 'fieldset')) {
+        if (!\is_string($field->type) || !str_contains($field->type, 'fieldset')) {
             return null;
         }
 
@@ -60,6 +60,6 @@ class FieldHelper
 
     public function isFieldset($field): bool
     {
-        return false !== strpos($field->type, 'fieldset');
+        return str_contains($field->type, 'fieldset');
     }
 }

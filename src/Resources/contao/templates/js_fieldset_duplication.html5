@@ -1,0 +1,10 @@
+<?= Contao\Template::generateScriptTag('bundles/contaofieldsetduplication/js.fieldset.duplication.min.js', false, null) ?>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var elements = document.querySelectorAll('fieldset.allow-duplication');
+
+    elements.forEach(function(element) {
+      fieldsetDuplication(element, {});
+    });
+  });
+</script>
