@@ -34,7 +34,7 @@ class Plugin implements BundlePluginInterface
                 ContaoCoreBundle::class,
                 'conditionalformfields',
                 'leads',
-                Terminal42LeadsBundle::class
+                Terminal42LeadsBundle::class,
             ]),
         ];
     }

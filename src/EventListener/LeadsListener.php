@@ -23,8 +23,8 @@ use Terminal42\LeadsBundle\Terminal42LeadsBundle;
 
 class LeadsListener implements ServiceSubscriberInterface
 {
-    private Connection         $connection;
-    private FieldHelper        $fieldHelper;
+    private Connection $connection;
+    private FieldHelper $fieldHelper;
     private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container, Connection $connection, FieldHelper $fieldHelper)
@@ -62,7 +62,9 @@ class LeadsListener implements ServiceSubscriberInterface
             ->setParameter('form_id', $formConfig['id'])
             ->setParameter('tstamp', time() - 60)
             ->setParameter('post_data', serialize($postData))
-            ->executeQuery()->fetchOne();
+            ->executeQuery()
+            ->fetchOne()
+        ;
 
         if (false !== $result) {
             $this->storeDuplicateFields($formConfig, $postData, $result, 3);
@@ -72,92 +74,9 @@ class LeadsListener implements ServiceSubscriberInterface
     /**
      * @Hook("storeLeadsData")
      */
-    public function onStoreLeadsData(array $arrPost, array $form, array $arrFiles = null, int $intLead): void
+    public function onStoreLeadsData(array $arrPost, array $form, ?array $arrFiles, int $intLead): void
     {
         $this->storeDuplicateFields($form, $arrPost, $intLead);
-    }
-
-    private function storeDuplicateFields(array $form, array $postData, int $leadId, int $leadsVersion = 1): void
-    {
-        $mainIdFieldName = 'master_id';
-        $mainFieldName = 'leadMaster';
-
-        if ($leadsVersion === 3) {
-            $mainIdFieldName = 'main_id';
-            $mainFieldName = 'leadMain';
-        }
-
-        // Fetch master form fields
-        if ($form[$mainFieldName] > 0) {
-            $leadFields = $this->connection->fetchAllAssociative(
-                "SELECT f2.*, f1.id AS ".$mainIdFieldName.", f1.name AS postName FROM tl_form_field f1 LEFT JOIN tl_form_field f2 ON f1.leadStore=f2.id WHERE f1.pid=? AND f1.leadStore>0 AND (f2.leadStore=? OR f2.type=? OR f2.type=?) AND f1.invisible=? ORDER BY f2.sorting",
-                [$form['id'], 1, 'fieldsetStart', 'fieldsetStop', '']
-            );
-        } else {
-            $leadFields = $this->connection->fetchAllAssociative(
-                "SELECT *, id AS ".$mainIdFieldName.", name AS postName FROM tl_form_field WHERE pid=? AND (leadStore=? OR type=? OR type=?) AND invisible=? ORDER BY sorting",
-                [$form['id'], 1, 'fieldsetStart', 'fieldsetStop', '']
-            );
-        }
-
-
-        $time = time();
-
-        foreach ($this->getDuplicateFields($leadFields) as $fieldset) {
-            $fieldsetFields = [];
-
-            // Collect the fields
-            foreach ($fieldset['fields'] as $field) {
-                foreach ($postData as $name => $value) {
-                    if (preg_match('/^(' . preg_quote($field['name']) . ')(_duplicate_(\d+))?$/', $name, $matches)) {
-                        $index = (int)($matches[3] ?? 0) + 1;
-                        if (class_exists(Formatter::class) && $this->container->has(Formatter::class)) {
-                            $fieldLabel = $this->container->get(Formatter::class)->dcaLabelFromArray($field);
-                            $fieldValue = $this->container->get(Formatter::class)->dcaValueFromArray($field, $value);
-                        } elseif (class_exists(Format::class)) {
-                            $fieldLabel = Format::dcaLabelFromArray($field);
-                            $fieldValue = Format::dcaValueFromArray($field, $value);
-                        } else {
-                            continue;
-                        }
-
-                        $fieldsetFields[$index][$field['name']] = [
-                            'label' => $fieldLabel,
-                            'value' => $fieldValue,
-                            'raw'   => $value,
-                        ];
-                    }
-                }
-            }
-
-            $label = [];
-
-            // Generate the label
-            foreach ($fieldsetFields as $index => $fields) {
-                foreach ($fields as $value) {
-                    $label[] = sprintf('%d. %s: %s', $index, $value['label'], $value['value']);
-                }
-            }
-
-            if (\count($fieldsetFields) > 0) {
-                $this->connection->insert('tl_lead_data', [
-                    'pid'           => $leadId,
-                    'sorting'       => $fieldset['fieldset']['sorting'],
-                    'tstamp'        => $time,
-                    $mainIdFieldName       => $fieldset['fieldset'][$mainIdFieldName],
-                    'field_id'      => $fieldset['fieldset']['id'],
-                    'name'          => $fieldset['fieldset']['name'],
-                    'value'         => serialize($label),
-                    'label'         => implode("\n", $label),
-                    'fieldset_data' => serialize($fieldsetFields),
-                ]);
-            }
-
-            // Remove the original fields that were duplicated
-            foreach ($fieldset['fields'] as $field) {
-                $this->connection->delete('tl_lead_data', ['pid' => $leadId, 'name' => $field['name']]);
-            }
-        }
     }
 
     public function getDuplicateFields(array $allFields): array
@@ -203,5 +122,87 @@ class LeadsListener implements ServiceSubscriberInterface
         }
 
         return $services;
+    }
+
+    private function storeDuplicateFields(array $form, array $postData, int $leadId, int $leadsVersion = 1): void
+    {
+        $mainIdFieldName = 'master_id';
+        $mainFieldName = 'leadMaster';
+
+        if (3 === $leadsVersion) {
+            $mainIdFieldName = 'main_id';
+            $mainFieldName = 'leadMain';
+        }
+
+        // Fetch master form fields
+        if ($form[$mainFieldName] > 0) {
+            $leadFields = $this->connection->fetchAllAssociative(
+                'SELECT f2.*, f1.id AS '.$mainIdFieldName.', f1.name AS postName FROM tl_form_field f1 LEFT JOIN tl_form_field f2 ON f1.leadStore=f2.id WHERE f1.pid=? AND f1.leadStore>0 AND (f2.leadStore=? OR f2.type=? OR f2.type=?) AND f1.invisible=? ORDER BY f2.sorting',
+                [$form['id'], 1, 'fieldsetStart', 'fieldsetStop', '']
+            );
+        } else {
+            $leadFields = $this->connection->fetchAllAssociative(
+                'SELECT *, id AS '.$mainIdFieldName.', name AS postName FROM tl_form_field WHERE pid=? AND (leadStore=? OR type=? OR type=?) AND invisible=? ORDER BY sorting',
+                [$form['id'], 1, 'fieldsetStart', 'fieldsetStop', '']
+            );
+        }
+
+        $time = time();
+
+        foreach ($this->getDuplicateFields($leadFields) as $fieldset) {
+            $fieldsetFields = [];
+
+            // Collect the fields
+            foreach ($fieldset['fields'] as $field) {
+                foreach ($postData as $name => $value) {
+                    if (preg_match('/^('.preg_quote($field['name']).')(_duplicate_(\d+))?$/', $name, $matches)) {
+                        $index = (int) ($matches[3] ?? 0) + 1;
+                        if (class_exists(Formatter::class) && $this->container->has(Formatter::class)) {
+                            $fieldLabel = $this->container->get(Formatter::class)->dcaLabelFromArray($field);
+                            $fieldValue = $this->container->get(Formatter::class)->dcaValueFromArray($field, $value);
+                        } elseif (class_exists(Format::class)) {
+                            $fieldLabel = Format::dcaLabelFromArray($field);
+                            $fieldValue = Format::dcaValueFromArray($field, $value);
+                        } else {
+                            continue;
+                        }
+
+                        $fieldsetFields[$index][$field['name']] = [
+                            'label' => $fieldLabel,
+                            'value' => $fieldValue,
+                            'raw' => $value,
+                        ];
+                    }
+                }
+            }
+
+            $label = [];
+
+            // Generate the label
+            foreach ($fieldsetFields as $index => $fields) {
+                foreach ($fields as $value) {
+                    $label[] = sprintf('%d. %s: %s', $index, $value['label'], $value['value']);
+                }
+            }
+
+            if (\count($fieldsetFields) > 0) {
+                $this->connection->insert('tl_lead_data', [
+                    'pid' => $leadId,
+                    'sorting' => $fieldset['fieldset']['sorting'],
+                    'tstamp' => $time,
+                    $mainIdFieldName => $fieldset['fieldset'][$mainIdFieldName],
+                    'field_id' => $fieldset['fieldset']['id'],
+                    'name' => $fieldset['fieldset']['name'],
+                    'value' => serialize($label),
+                    'label' => implode("\n", $label),
+                    'fieldset_data' => serialize($fieldsetFields),
+                ]);
+            }
+
+            // Remove the original fields that were duplicated
+            foreach ($fieldset['fields'] as $field) {
+                $this->connection->delete('tl_lead_data', ['pid' => $leadId, 'name' => $field['name']]);
+            }
+        }
     }
 }

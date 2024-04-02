@@ -50,7 +50,7 @@ class NotificationTokenTemplatesMigration extends AbstractMigration
 
             foreach (StringUtil::deserialize($field['notificationTokenTemplates'], true) as $key => $template) {
                 if (is_numeric($key)) {
-                    $key = $key + 1;
+                    ++$key;
                 }
 
                 $templates[$key] = $template;
