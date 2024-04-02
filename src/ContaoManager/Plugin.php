@@ -17,6 +17,7 @@ use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use InspiredMinds\ContaoFieldsetDuplication\ContaoFieldsetDuplication;
+use Terminal42\ConditionalformfieldsBundle\Terminal42ConditionalformfieldsBundle;
 use Terminal42\LeadsBundle\Terminal42LeadsBundle;
 
 /**
@@ -34,6 +35,7 @@ class Plugin implements BundlePluginInterface
                 ContaoCoreBundle::class,
                 'conditionalformfields',
                 'leads',
+                Terminal42ConditionalformfieldsBundle::class,
                 Terminal42LeadsBundle::class,
             ]),
         ];
