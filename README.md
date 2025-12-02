@@ -37,7 +37,8 @@ generator's ability to store the data in the database), you need to add a column
 called `fieldset_duplicates` to your target table. This column will then contain 
 the additionally submitted fields in a JSON encoded object.
 
-__Note:__ version `2.1.0` introduced the `js_fieldset_duplication` template. There also exists a jQuery version
+> [!NOTE]  
+> Version `2.1.0` introduced the `js_fieldset_duplication` template. There also exists a jQuery version
 under the name `j_fieldset_duplication` from previous versions of this extension for BC purposes. Make sure to _not_ 
 enable both these templates.
 
