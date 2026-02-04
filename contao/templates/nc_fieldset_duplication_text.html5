@@ -1,6 +1,6 @@
 <?php foreach ($this->values as $row): ?>
 <?php foreach ($row as $name => $value): ?>
-<?= $this->labels[$name] ?>: <?= $value ?>
+<?= $this->labels[$name] ?? $name ?>: <?= $value ?>
 
 <?php endforeach ?>
 

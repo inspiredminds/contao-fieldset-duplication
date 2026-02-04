@@ -2,7 +2,7 @@
   "name": "contao-fieldset-duplication",
   "main": "gulpfile.js",
   "dependencies": {
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.1",
     "gulp-rename": "^1.4.0",
     "gulp-uglify-es": "^3.0"
   }

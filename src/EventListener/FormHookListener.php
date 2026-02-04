@@ -3,22 +3,16 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the inspiredminds/contao-fieldset-duplication package.
- *
- * (c) inspiredminds
- *
- * @license LGPL-3.0-or-later
+ * (c) INSPIRED MINDS
  */
 
 namespace InspiredMinds\ContaoFieldsetDuplication\EventListener;
 
-use Contao\Config;
 use Contao\Database;
 use Contao\Form;
 use Contao\FormFieldModel;
 use Contao\FrontendTemplate;
 use Contao\StringUtil;
-use Contao\System;
 use Contao\Widget;
 use InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -28,20 +22,16 @@ class FormHookListener
 {
     public const TABLE_FIELD = 'fieldset_duplicates';
 
-    protected $requestStack;
-    protected $fieldHelper;
-    protected $formManagerFactory;
-
-    public function __construct(RequestStack $requestStack, FieldHelper $fieldHelper, FormManagerFactoryInterface $formManagerFactory = null)
-    {
-        $this->requestStack = $requestStack;
-        $this->fieldHelper = $fieldHelper;
-        $this->formManagerFactory = $formManagerFactory;
+    public function __construct(
+        private RequestStack $requestStack,
+        private FieldHelper $fieldHelper,
+        private FormManagerFactoryInterface|null $formManagerFactory = null,
+    ) {
     }
 
     public function onLoadFormField(Widget $widget, string $formId, array $data, Form $form): Widget
     {
-        if ($this->fieldHelper->isFieldsetStart($widget) && $widget->allowDuplication && false === strpos($widget->name, '_duplicate_')) {
+        if ($this->fieldHelper->isFieldsetStart($widget) && $widget->allowDuplication && !str_contains($widget->name, '_duplicate_')) {
             $arrClasses = !empty($widget->class) ? explode(' ', $widget->class) : [];
             $arrClasses[] = 'allow-duplication';
             $arrClasses[] = 'duplicate-fieldset-'.$widget->id;
@@ -78,9 +68,14 @@ class FormHookListener
         }
 
         // Get the submitted data from MPForms
-        if (count($submittedData) === 0 && $this->formManagerFactory !== null) {
-            $manager = $this->formManagerFactory->forFormId((int) $objForm->id);
-            $submittedData = $manager->getDataOfStep($manager->getCurrentStep())->getOriginalPostData()->all();
+        if ([] === $submittedData && ($this->formManagerFactory || class_exists(\MPFormsFormManager::class))) {
+            if ($this->formManagerFactory) {
+                $manager = $this->formManagerFactory->forFormId((int) $objForm->id);
+                $submittedData = $manager->getDataOfStep($manager->getCurrentStep())->getOriginalPostData()->all();
+            } else {
+                $manager = new \MPFormsFormManager($objForm->id);
+                $submittedData = $manager->getDataOfStep($manager->getCurrentStep())['originalPostData'] ?? [];
+            }
         }
 
         // check if form was submitted
@@ -103,7 +98,8 @@ class FormHookListener
                     $originalName = substr($duplicateName, 0, $intPos);
 
                     // get the duplicate number
-                    $duplicateNumber = (int) (substr($duplicateName, -1));
+                    preg_match_all('!\d+!', $duplicateName, $numberMatches);
+                    $duplicateNumber = (int) end($numberMatches[0]);
 
                     // clone the fieldset
                     foreach ($fieldsetGroups as $fieldsetGroup) {
@@ -123,7 +119,7 @@ class FormHookListener
 
                                     // remove allow duplication class
                                     if ($this->fieldHelper->isFieldsetStart($clone)) {
-                                        $clone->class = implode(' ', array_diff(explode(' ', $clone->class), ['allow-duplication']));
+                                        $clone->class = implode(' ', array_diff(explode(' ', $clone->class ?? ''), ['allow-duplication']));
                                         $clone->class .= ($clone->class ? ' ' : '').'duplicate-fieldset-'.$field->id.' duplicate';
                                     }
 
@@ -165,6 +161,7 @@ class FormHookListener
             foreach ($fieldsetDuplicates as $duplicatedFieldset) {
                 // search for the stop field
                 $stopId = null;
+
                 foreach ($duplicatedFieldset as $duplicatedField) {
                     if ($this->fieldHelper->isFieldsetStop($duplicatedField)) {
                         $stopId = $duplicatedField->originalId;
@@ -175,6 +172,7 @@ class FormHookListener
                 // search for the index position of the original stop field
                 if (null !== $stopId) {
                     $stopIdx = null;
+
                     for ($i = 0; $i < \count($fields); ++$i) {
                         if ($fields[$i]->id === $stopId) {
                             $stopIdx = $i;
@@ -200,7 +198,7 @@ class FormHookListener
         $duplicateFieldsData = [];
 
         foreach ($set as $name => $value) {
-            if (false !== strpos($name, '_duplicate_')) {
+            if (str_contains($name, '_duplicate_')) {
                 $duplicateFieldsData[$name] = $value;
                 continue;
             }
@@ -208,8 +206,8 @@ class FormHookListener
             $newSet[$name] = $value;
         }
 
-        if (!empty($duplicateFieldsData) && Database::getInstance()->fieldExists(self::TABLE_FIELD, $form->targetTable)) {
-            $newSet['fieldset_duplicates'] = json_encode($duplicateFieldsData);
+        if ([] !== $duplicateFieldsData && Database::getInstance()->fieldExists(self::TABLE_FIELD, $form->targetTable)) {
+            $newSet['fieldset_duplicates'] = json_encode($duplicateFieldsData, JSON_THROW_ON_ERROR);
         }
 
         return $newSet;
@@ -220,45 +218,44 @@ class FormHookListener
         $fieldsetGroups = $this->buildFieldsetGroups($fields);
         $values = $this->groupFieldsetValues($fieldsetGroups, $submittedData);
 
-        // Disable debug mode so that no html comments are rendered in the templates
-        $debugMode = Config::get('debugMode');
-        Config::set('debugMode', false);
-
         foreach ($values as $row) {
             if (!$row['config']->allowDuplication) {
                 continue;
             }
 
             $templateFormats = StringUtil::deserialize($row['config']->notificationTokenTemplates, true);
+
             foreach ($templateFormats as $format) {
                 if (!$format['format'] || !$format['template']) {
                     continue;
                 }
 
                 $template = new FrontendTemplate($format['template']);
+                $template->setDebug(false);
                 $template->setData(
                     [
                         'labels' => $labels,
                         'form' => $form,
                         'config' => $row['config'],
                         'values' => $row['data'],
-                    ]
+                    ],
                 );
 
                 $submittedData[$row['config']->name.'_'.$format['format']] = $template->parse();
             }
         }
-
-        Config::set('debugMode', $debugMode);
     }
 
     /**
-     * @param array|Widget[]|FormFieldModel[] $fields
+     * @param array|array<Widget>|array<FormFieldModel> $fields
      */
     private function buildFieldsetGroups(array $fields): array
     {
         // field set groups
         $fieldsetGroups = [];
+
+        // fielset group stack
+        $fieldsetGroupStack = [];
 
         // field set group
         $fieldsetGroup = [];
@@ -266,13 +263,27 @@ class FormHookListener
         // go through each field
         foreach ($fields as $field) {
             // check if we can process duplicates
-            if ($this->fieldHelper->isFieldsetStart($field)) {
+            if ($this->fieldHelper->isFieldsetStart($field) && $field->allowDuplication) {
+                // check if nested fieldsets are detected and ensure fields are collected
+                if ([] !== $fieldsetGroupStack) {
+                    $fieldsetGroups[$fieldsetGroup[0]->id] = $fieldsetGroup;
+                    $fieldsetGroup = [];
+                }
+
                 $fieldsetGroup[] = $field;
-            } elseif ($this->fieldHelper->isFieldsetStop($field)) {
+                $fieldsetGroupStack[] = $field->id;
+            } elseif ($this->fieldHelper->isFieldsetStop($field) && $fieldsetGroup[0]?->allowDuplication) {
+                $groupId = array_pop($fieldsetGroupStack);
                 $fieldsetGroup[] = $field;
-                $fieldsetGroups[$fieldsetGroup[0]->id] = $fieldsetGroup;
-                $fieldsetGroup = [];
-            } elseif (!empty($fieldsetGroup)) {
+                $fieldsetGroups[$groupId] = $fieldsetGroup;
+
+                // Check if nested fieldset are used and restore the out fieldset group
+                if ($fieldsetGroupStack) {
+                    $fieldsetGroup = $fieldsetGroups[current($fieldsetGroupStack)];
+                } else {
+                    $fieldsetGroup = [];
+                }
+            } elseif ([] !== $fieldsetGroup) {
                 $fieldsetGroup[] = $field;
             }
         }
@@ -284,7 +295,7 @@ class FormHookListener
     {
         $data = [];
 
-        foreach ($fieldsetGroups as $fieldsetId => $fieldsetGroup) {
+        foreach ($fieldsetGroups as $fieldsetGroup) {
             $row = [];
             $referenceGroup = $fieldsetGroup[0]->originalId > 0
                 ? $fieldsetGroups[$fieldsetGroup[0]->originalId]

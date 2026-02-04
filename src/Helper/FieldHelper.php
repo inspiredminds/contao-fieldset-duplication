@@ -22,7 +22,7 @@ class FieldHelper
     {
         try {
             $contaoVersion = PrettyVersions::getVersion('contao/core-bundle');
-        } catch (ReplacedPackageException $e) {
+        } catch (ReplacedPackageException) {
             $contaoVersion = PrettyVersions::getVersion('contao/contao');
         }
 
@@ -39,15 +39,15 @@ class FieldHelper
         return 'stop' === $this->getFieldsetType($field);
     }
 
-    public function getFieldsetType($field): ?string
+    public function getFieldsetType($field): string|null
     {
-        if (!\is_string($field->type) || false === strpos($field->type, 'fieldset')) {
+        if (!\is_string($field->type) || !str_contains($field->type, 'fieldset')) {
             return null;
         }
 
         try {
             $contaoVersion = PrettyVersions::getVersion('contao/core-bundle');
-        } catch (ReplacedPackageException $e) {
+        } catch (ReplacedPackageException) {
             $contaoVersion = PrettyVersions::getVersion('contao/contao');
         }
 
@@ -60,6 +60,6 @@ class FieldHelper
 
     public function isFieldset($field): bool
     {
-        return false !== strpos($field->type, 'fieldset');
+        return str_contains($field->type, 'fieldset');
     }
 }

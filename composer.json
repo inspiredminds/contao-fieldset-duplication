@@ -26,20 +26,21 @@
         }
     ],
     "require":{
-        "php": ">=7.4",
+        "php": ">=8.0",
         "ext-json": "*",
-        "contao/core-bundle": "^4.9 || ^5.0",
+        "contao/core-bundle": "^4.13 || ^5.0",
         "composer/semver": "^1.0 || ^2.0 || ^3.0",
-        "doctrine/dbal": "^2.11 || ^3.0",
+        "doctrine/dbal": "^3.1 || ^4.0",
         "jean85/pretty-package-versions": "^1.0 || ^2.0",
         "mvo/contao-group-widget": "^1.3",
-        "php-http/message-factory": "^1.1"
+        "symfony/service-contracts": "^1.0 || ^2.0 || ^3.0"
     },
     "require-dev": {
-         "contao/manager-plugin": "^2.0",
-         "friendsofphp/php-cs-fixer": "^3.0",
-         "terminal42/contao-leads": "^3.0",
-         "terminal42/contao-mp_forms": "^5.0"
+        "contao/easy-coding-standard": "^6.0",
+        "contao/manager-plugin": "^2.0",
+        "contao/rector": "^1.0",
+        "terminal42/contao-leads": "^1.4 || ^3.0",
+        "terminal42/contao-mp_forms": "^4.4 || ^5.0"
     },
     "autoload": {
         "psr-4": {
@@ -53,7 +54,9 @@
         "allow-plugins": {
             "contao-components/installer": true,
             "contao/manager-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": false,
+            "contao-community-alliance/composer-plugin": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     }
 }
