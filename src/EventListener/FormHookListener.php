@@ -275,7 +275,7 @@ class FormHookListener
 
                 $fieldsetGroup[] = $field;
                 $fieldsetGroupStack[] = $field->id;
-            } elseif ($this->fieldHelper->isFieldsetStop($field)) {
+            } elseif ($this->fieldHelper->isFieldsetStop($field) && $fieldsetGroup[0]?->allowDuplication) {
                 $groupId = array_pop($fieldsetGroupStack);
                 $fieldsetGroup[] = $field;
                 $fieldsetGroups[$groupId] = $fieldsetGroup;
