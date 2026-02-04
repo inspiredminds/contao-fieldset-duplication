@@ -217,10 +217,6 @@ class FormHookListener
         $fieldsetGroups = $this->buildFieldsetGroups($fields);
         $values = $this->groupFieldsetValues($fieldsetGroups, $submittedData);
 
-        // Disable debug mode so that no html comments are rendered in the templates
-        $debugMode = Config::get('debugMode');
-        Config::set('debugMode', false);
-
         foreach ($values as $row) {
             if (!$row['config']->allowDuplication) {
                 continue;
@@ -233,6 +229,8 @@ class FormHookListener
                 }
 
                 $template = new FrontendTemplate($format['template']);
+                // Disable debug mode so that no html comments are rendered in the templates
+                $template->setDebug(false);
                 $template->setData(
                     [
                         'labels' => $labels,
@@ -245,8 +243,6 @@ class FormHookListener
                 $submittedData[$row['config']->name.'_'.$format['format']] = $template->parse();
             }
         }
-
-        Config::set('debugMode', $debugMode);
     }
 
     /**
