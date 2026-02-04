@@ -3,11 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the inspiredminds/contao-fieldset-duplication package.
- *
- * (c) inspiredminds
- *
- * @license LGPL-3.0-or-later
+ * (c) INSPIRED MINDS
  */
 
 namespace InspiredMinds\ContaoFieldsetDuplication\EventListener;
@@ -19,11 +15,8 @@ use InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper;
 
 final class FormFieldDcaListener
 {
-    private $fieldHelper;
-
-    public function __construct(FieldHelper $fieldHelper)
+    public function __construct(private FieldHelper $fieldHelper)
     {
-        $this->fieldHelper = $fieldHelper;
     }
 
     /**

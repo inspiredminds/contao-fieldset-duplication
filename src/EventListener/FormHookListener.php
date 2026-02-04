@@ -3,16 +3,11 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the inspiredminds/contao-fieldset-duplication package.
- *
- * (c) inspiredminds
- *
- * @license LGPL-3.0-or-later
+ * (c) INSPIRED MINDS
  */
 
 namespace InspiredMinds\ContaoFieldsetDuplication\EventListener;
 
-use Contao\Config;
 use Contao\Database;
 use Contao\Form;
 use Contao\FormFieldModel;
@@ -26,13 +21,10 @@ class FormHookListener
 {
     public const TABLE_FIELD = 'fieldset_duplicates';
 
-    protected $requestStack;
-    protected $fieldHelper;
-
-    public function __construct(RequestStack $requestStack, FieldHelper $fieldHelper)
-    {
-        $this->requestStack = $requestStack;
-        $this->fieldHelper = $fieldHelper;
+    public function __construct(
+        private RequestStack $requestStack,
+        private FieldHelper $fieldHelper,
+    ) {
     }
 
     public function onLoadFormField(Widget $widget, string $formId, array $data, Form $form): Widget
@@ -162,6 +154,7 @@ class FormHookListener
             foreach ($fieldsetDuplicates as $duplicatedFieldset) {
                 // search for the stop field
                 $stopId = null;
+
                 foreach ($duplicatedFieldset as $duplicatedField) {
                     if ($this->fieldHelper->isFieldsetStop($duplicatedField)) {
                         $stopId = $duplicatedField->originalId;
@@ -172,6 +165,7 @@ class FormHookListener
                 // search for the index position of the original stop field
                 if (null !== $stopId) {
                     $stopIdx = null;
+
                     for ($i = 0; $i < \count($fields); ++$i) {
                         if ($fields[$i]->id === $stopId) {
                             $stopIdx = $i;
@@ -205,8 +199,8 @@ class FormHookListener
             $newSet[$name] = $value;
         }
 
-        if (!empty($duplicateFieldsData) && Database::getInstance()->fieldExists(self::TABLE_FIELD, $form->targetTable)) {
-            $newSet['fieldset_duplicates'] = json_encode($duplicateFieldsData);
+        if ([] !== $duplicateFieldsData && Database::getInstance()->fieldExists(self::TABLE_FIELD, $form->targetTable)) {
+            $newSet['fieldset_duplicates'] = json_encode($duplicateFieldsData, JSON_THROW_ON_ERROR);
         }
 
         return $newSet;
@@ -217,40 +211,36 @@ class FormHookListener
         $fieldsetGroups = $this->buildFieldsetGroups($fields);
         $values = $this->groupFieldsetValues($fieldsetGroups, $submittedData);
 
-        // Disable debug mode so that no html comments are rendered in the templates
-        $debugMode = Config::get('debugMode');
-        Config::set('debugMode', false);
-
         foreach ($values as $row) {
             if (!$row['config']->allowDuplication) {
                 continue;
             }
 
             $templateFormats = StringUtil::deserialize($row['config']->notificationTokenTemplates, true);
+
             foreach ($templateFormats as $format) {
                 if (!$format['format'] || !$format['template']) {
                     continue;
                 }
 
                 $template = new FrontendTemplate($format['template']);
+                $template->setDebug(false);
                 $template->setData(
                     [
                         'labels' => $labels,
                         'form' => $form,
                         'config' => $row['config'],
                         'values' => $row['data'],
-                    ]
+                    ],
                 );
 
                 $submittedData[$row['config']->name.'_'.$format['format']] = $template->parse();
             }
         }
-
-        Config::set('debugMode', $debugMode);
     }
 
     /**
-     * @param array|Widget[]|FormFieldModel[] $fields
+     * @param array|array<Widget>|array<FormFieldModel> $fields
      */
     private function buildFieldsetGroups(array $fields): array
     {
@@ -286,7 +276,7 @@ class FormHookListener
                 } else {
                     $fieldsetGroup = [];
                 }
-            } elseif (!empty($fieldsetGroup)) {
+            } elseif ([] !== $fieldsetGroup) {
                 $fieldsetGroup[] = $field;
             }
         }
@@ -298,7 +288,7 @@ class FormHookListener
     {
         $data = [];
 
-        foreach ($fieldsetGroups as $fieldsetId => $fieldsetGroup) {
+        foreach ($fieldsetGroups as $fieldsetGroup) {
             $row = [];
             $referenceGroup = $fieldsetGroup[0]->originalId > 0
                 ? $fieldsetGroups[$fieldsetGroup[0]->originalId]

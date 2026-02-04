@@ -23,15 +23,11 @@ use Terminal42\LeadsBundle\Terminal42LeadsBundle;
 
 class LeadsListener implements ServiceSubscriberInterface
 {
-    private Connection $connection;
-    private FieldHelper $fieldHelper;
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container, Connection $connection, FieldHelper $fieldHelper)
-    {
-        $this->connection = $connection;
-        $this->fieldHelper = $fieldHelper;
-        $this->container = $container;
+    public function __construct(
+        private ContainerInterface $container,
+        private Connection $connection,
+        private FieldHelper $fieldHelper,
+    ) {
     }
 
     /**
@@ -74,7 +70,7 @@ class LeadsListener implements ServiceSubscriberInterface
     /**
      * @Hook("storeLeadsData")
      */
-    public function onStoreLeadsData(array $arrPost, array $form, ?array $arrFiles, int $intLead): void
+    public function onStoreLeadsData(array $arrPost, array $form, array|null $arrFiles, int $intLead): void
     {
         $this->storeDuplicateFields($form, $arrPost, $intLead);
     }
@@ -138,12 +134,12 @@ class LeadsListener implements ServiceSubscriberInterface
         if ($form[$mainFieldName] > 0) {
             $leadFields = $this->connection->fetchAllAssociative(
                 'SELECT f2.*, f1.id AS '.$mainIdFieldName.', f1.name AS postName FROM tl_form_field f1 LEFT JOIN tl_form_field f2 ON f1.leadStore=f2.id WHERE f1.pid=? AND f1.leadStore>0 AND (f2.leadStore=? OR f2.type=? OR f2.type=?) AND f1.invisible=? ORDER BY f2.sorting',
-                [$form['id'], 1, 'fieldsetStart', 'fieldsetStop', '']
+                [$form['id'], 1, 'fieldsetStart', 'fieldsetStop', ''],
             );
         } else {
             $leadFields = $this->connection->fetchAllAssociative(
                 'SELECT *, id AS '.$mainIdFieldName.', name AS postName FROM tl_form_field WHERE pid=? AND (leadStore=? OR type=? OR type=?) AND invisible=? ORDER BY sorting',
-                [$form['id'], 1, 'fieldsetStart', 'fieldsetStop', '']
+                [$form['id'], 1, 'fieldsetStart', 'fieldsetStop', ''],
             );
         }
 
@@ -181,11 +177,11 @@ class LeadsListener implements ServiceSubscriberInterface
             // Generate the label
             foreach ($fieldsetFields as $index => $fields) {
                 foreach ($fields as $value) {
-                    $label[] = sprintf('%d. %s: %s', $index, $value['label'], $value['value']);
+                    $label[] = \sprintf('%d. %s: %s', $index, $value['label'], $value['value']);
                 }
             }
 
-            if (\count($fieldsetFields) > 0) {
+            if ([] !== $fieldsetFields) {
                 $this->connection->insert('tl_lead_data', [
                     'pid' => $leadId,
                     'sorting' => $fieldset['fieldset']['sorting'],
