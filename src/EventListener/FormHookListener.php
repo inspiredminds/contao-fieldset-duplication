@@ -266,7 +266,7 @@ class FormHookListener
         // go through each field
         foreach ($fields as $field) {
             // check if we can process duplicates
-            if ($this->fieldHelper->isFieldsetStart($field)) {
+            if ($this->fieldHelper->isFieldsetStart($field) && $field->allowDuplication) {
                 // check if nested fieldsets are detected and ensure fields are collected
                 if ([] !== $fieldsetGroupStack) {
                     $fieldsetGroups[$fieldsetGroup[0]->id] = $fieldsetGroup;
@@ -275,7 +275,7 @@ class FormHookListener
 
                 $fieldsetGroup[] = $field;
                 $fieldsetGroupStack[] = $field->id;
-            } elseif ($this->fieldHelper->isFieldsetStop($field)) {
+            } elseif ($this->fieldHelper->isFieldsetStop($field) && $fieldsetGroup[0]?->allowDuplication) {
                 $groupId = array_pop($fieldsetGroupStack);
                 $fieldsetGroup[] = $field;
                 $fieldsetGroups[$groupId] = $fieldsetGroup;
