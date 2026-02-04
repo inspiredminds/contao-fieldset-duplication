@@ -8,6 +8,7 @@ services:
     arguments:
       - '@request_stack'
       - '@inspiredminds.fieldsetduplication.helper.field'
+      - '@?Terminal42\MultipageFormsBundle\FormManagerFactoryInterface'
     tags:
       - { name: contao.hook, hook: loadFormField, method: onLoadFormField }
       - { name: contao.hook, hook: compileFormFields, method: onCompileFormFields, priority: -100}

@@ -40,7 +40,7 @@
         "contao/manager-plugin": "^2.0",
         "contao/rector": "^1.0",
         "terminal42/contao-leads": "^1.4 || ^3.0",
-        "terminal42/contao-mp_forms": "^4.4"
+        "terminal42/contao-mp_forms": "^4.4 || ^5.0"
     },
     "autoload": {
         "psr-4": {
