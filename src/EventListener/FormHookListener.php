@@ -63,7 +63,7 @@ class FormHookListener
         $submittedData = [];
 
         // Get the submitted data from the request
-        if (($request = $this->requestStack->getCurrentRequest()) !== null) {
+        if ($request = $this->requestStack->getCurrentRequest()) {
             $submittedData = $request->request->all();
         }
 
@@ -71,11 +71,17 @@ class FormHookListener
         if ([] === $submittedData && ($this->formManagerFactory || class_exists(\MPFormsFormManager::class))) {
             if ($this->formManagerFactory) {
                 $manager = $this->formManagerFactory->forFormId((int) $objForm->id);
-                $submittedData = $manager->getDataOfStep($manager->getCurrentStep())->getOriginalPostData()->all();
+                $step = $manager->getCurrentStep();
+
+                if ($manager->hasStep($step)) {
+                    $submittedData = $manager->getDataOfStep($manager->getCurrentStep())->getOriginalPostData()->all();
+                }
             } else {
                 $manager = new \MPFormsFormManager($objForm->id);
                 $submittedData = $manager->getDataOfStep($manager->getCurrentStep())['originalPostData'] ?? [];
             }
+
+            unset($manager);
         }
 
         // check if form was submitted
