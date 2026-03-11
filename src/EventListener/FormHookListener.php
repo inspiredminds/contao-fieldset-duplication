@@ -221,7 +221,7 @@ class FormHookListener
 
     public function onPrepareFormData(array &$submittedData, array $labels, array $fields, Form $form): void
     {
-        $fieldsetGroups = $this->buildFieldsetGroups($fields);
+        $fieldsetGroups = $this->buildFieldsetGroups($fields, true);
         $values = $this->groupFieldsetValues($fieldsetGroups, $submittedData);
 
         foreach ($values as $row) {
@@ -255,7 +255,7 @@ class FormHookListener
     /**
      * @param array|array<Widget>|array<FormFieldModel> $fields
      */
-    private function buildFieldsetGroups(array $fields): array
+    private function buildFieldsetGroups(array $fields, bool $allowedDuplicationOnly = false): array
     {
         // field set groups
         $fieldsetGroups = [];
@@ -269,7 +269,7 @@ class FormHookListener
         // go through each field
         foreach ($fields as $field) {
             // check if we can process duplicates
-            if ($this->fieldHelper->isFieldsetStart($field) && $field->allowDuplication) {
+            if ($this->fieldHelper->isFieldsetStart($field) && (!$allowedDuplicationOnly || $field->allowDuplication)) {
                 // check if nested fieldsets are detected and ensure fields are collected
                 if ([] !== $fieldsetGroupStack) {
                     $fieldsetGroups[$fieldsetGroup[0]->id] = $fieldsetGroup;
@@ -278,7 +278,7 @@ class FormHookListener
 
                 $fieldsetGroup[] = $field;
                 $fieldsetGroupStack[] = $field->id;
-            } elseif ($this->fieldHelper->isFieldsetStop($field) && $fieldsetGroup[0]?->allowDuplication) {
+            } elseif ($this->fieldHelper->isFieldsetStop($field) && (!$allowedDuplicationOnly || $fieldsetGroup[0]?->allowDuplication)) {
                 $groupId = array_pop($fieldsetGroupStack);
                 $fieldsetGroup[] = $field;
                 $fieldsetGroups[$groupId] = $fieldsetGroup;
