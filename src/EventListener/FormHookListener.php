@@ -14,6 +14,7 @@ use Contao\FormFieldModel;
 use Contao\FrontendTemplate;
 use Contao\StringUtil;
 use Contao\Widget;
+use FormModel;
 use InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Terminal42\MultipageFormsBundle\FormManagerFactoryInterface;
@@ -68,13 +69,18 @@ class FormHookListener
         }
 
         // Get the submitted data from MPForms
-        if ([] === $submittedData && ($this->formManagerFactory || class_exists(\MPFormsFormManager::class))) {
+        if ([] === $submittedData && ($this->formManagerFactory || class_exists(\MPFormsFormManager::class)) && $objForm->id) {
             if ($this->formManagerFactory) {
                 $manager = $this->formManagerFactory->forFormId((int) $objForm->id);
-                $step = $manager->getCurrentStep();
 
-                if ($manager->hasStep($step)) {
-                    $submittedData = $manager->getDataOfStep($manager->getCurrentStep())->getOriginalPostData()->all();
+                try {
+                    $step = $manager->getCurrentStep();
+
+                    if ($manager->hasStep($step)) {
+                        $submittedData = $manager->getDataOfStep($manager->getCurrentStep())->getOriginalPostData()->all();
+                    }
+                } catch (\InvalidArgumentException) {
+                    // noop
                 }
             } else {
                 $manager = new \MPFormsFormManager($objForm->id);
