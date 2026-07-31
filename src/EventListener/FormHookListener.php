@@ -16,6 +16,7 @@ use Contao\StringUtil;
 use Contao\Widget;
 use FormModel;
 use InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper;
+use Oveleon\ContaoAdvancedForm\Storage\FormStorage;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Terminal42\MultipageFormsBundle\FormManagerFactoryInterface;
 
@@ -27,6 +28,7 @@ class FormHookListener
         private RequestStack $requestStack,
         private FieldHelper $fieldHelper,
         private FormManagerFactoryInterface|null $formManagerFactory = null,
+        private string $projectDir = '',
     ) {
     }
 
@@ -88,6 +90,25 @@ class FormHookListener
             }
 
             unset($manager);
+        }
+
+        // Get the submitted data from Contao Advanced Form. Its page switch redirects, so the fields of a step that
+        // is revisited (e.g. via the back button) arrive as a GET request without any submitted data. Without this,
+        // the duplicated fieldsets would not be recreated and the visitor would only see the original one.
+        if (
+            [] === $submittedData
+            && $objForm->id
+            && $request?->hasPreviousSession()
+            && class_exists(FormStorage::class)
+        ) {
+            $submittedData = (new FormStorage((string) $objForm->id, $this->projectDir, $this->requestStack))
+                ->get([])['submitted'];
+
+            // Satisfy the check below. This is a local array, the request itself is not modified - otherwise Contao
+            // would treat this request as a form submission.
+            if ([] !== $submittedData) {
+                $submittedData['FORM_SUBMIT'] = $formId;
+            }
         }
 
         // check if form was submitted
