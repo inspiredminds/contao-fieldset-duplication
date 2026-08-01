@@ -14,7 +14,6 @@ use Contao\FormFieldModel;
 use Contao\FrontendTemplate;
 use Contao\StringUtil;
 use Contao\Widget;
-use FormModel;
 use InspiredMinds\ContaoFieldsetDuplication\Helper\FieldHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Terminal42\MultipageFormsBundle\FormManagerFactoryInterface;
