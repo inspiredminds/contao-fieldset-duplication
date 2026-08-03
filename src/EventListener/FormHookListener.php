@@ -31,6 +31,11 @@ class FormHookListener
 
     public function onLoadFormField(Widget $widget, string $formId, array $data, Form $form): Widget
     {
+        // Apply the unique DOM id of a duplicated field (see onCompileFormFields())
+        if ($widget->duplicateId) {
+            $widget->id = $widget->duplicateId;
+        }
+
         if ($this->fieldHelper->isFieldsetStart($widget) && $widget->allowDuplication && !str_contains($widget->name, '_duplicate_')) {
             $arrClasses = !empty($widget->class) ? explode(' ', $widget->class) : [];
             $arrClasses[] = 'allow-duplication';
@@ -135,7 +140,12 @@ class FormHookListener
                                     }
 
                                     // set the id
-                                    $clone->id = $field->id.'_duplicate_'.$duplicateNumber;
+                                    // Model::__clone() removes the primary key, so the clone has no id at all.
+                                    // It must not be set on the id property though: tl_form_field.id is an integer
+                                    // column, and Model::convertToPhpValue() raises "A non-numeric value
+                                    // encountered" plus a deprecation for a composite value like "42_duplicate_1".
+                                    // duplicateId is not a database column and is therefore left untouched.
+                                    $clone->duplicateId = $field->id.'_duplicate_'.$duplicateNumber;
 
                                     // set the original id
                                     $clone->originalId = $field->id;
@@ -258,6 +268,17 @@ class FormHookListener
     }
 
     /**
+     * Returns the identifier a fieldset group is stored under. Duplicated fieldsets are identified by their
+     * duplicate id, so their group does not overwrite the group of the original fieldset.
+     *
+     * @param Widget|FormFieldModel $field
+     */
+    private function getFieldsetGroupId($field): int|string
+    {
+        return $field->duplicateId ?: $field->id;
+    }
+
+    /**
      * @param array|array<Widget>|array<FormFieldModel> $fields
      */
     private function buildFieldsetGroups(array $fields, bool $allowedDuplicationOnly = false): array
@@ -277,12 +298,12 @@ class FormHookListener
             if ($this->fieldHelper->isFieldsetStart($field) && (!$allowedDuplicationOnly || $field->allowDuplication)) {
                 // check if nested fieldsets are detected and ensure fields are collected
                 if ([] !== $fieldsetGroupStack) {
-                    $fieldsetGroups[$fieldsetGroup[0]->id] = $fieldsetGroup;
+                    $fieldsetGroups[$this->getFieldsetGroupId($fieldsetGroup[0])] = $fieldsetGroup;
                     $fieldsetGroup = [];
                 }
 
                 $fieldsetGroup[] = $field;
-                $fieldsetGroupStack[] = $field->id;
+                $fieldsetGroupStack[] = $this->getFieldsetGroupId($field);
             } elseif ($this->fieldHelper->isFieldsetStop($field) && (!$allowedDuplicationOnly || ($fieldsetGroup[0] ?? null)?->allowDuplication)) {
                 $groupId = array_pop($fieldsetGroupStack);
                 $fieldsetGroup[] = $field;
