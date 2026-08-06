@@ -170,10 +170,11 @@ class FormHookListener
 
             // go through the duplicated fieldsets
             foreach ($fieldsetDuplicates as $duplicatedFieldset) {
-                // search for the stop field
+                // search for the stop field - the last one, because a group can contain nested fieldsets and only
+                // its own stop field marks the position the duplicate has to be inserted after
                 $stopId = null;
 
-                foreach ($duplicatedFieldset as $duplicatedField) {
+                foreach (array_reverse($duplicatedFieldset) as $duplicatedField) {
                     if ($this->fieldHelper->isFieldsetStop($duplicatedField)) {
                         $stopId = $duplicatedField->originalId;
                         break;
@@ -271,8 +272,30 @@ class FormHookListener
         // field set group
         $fieldsetGroup = [];
 
+        // number of nested fieldsets without duplication within the current group
+        $nestedFieldsets = 0;
+
         // go through each field
         foreach ($fields as $field) {
+            // Fieldsets without duplication inside an open group belong to that group - they are used for layout
+            // and must be duplicated together with it, otherwise the group would be split into several groups and
+            // each part would be inserted after its own fieldset stop.
+            if ([] !== $fieldsetGroup && !$field->allowDuplication && $this->fieldHelper->isFieldset($field)) {
+                if ($this->fieldHelper->isFieldsetStart($field)) {
+                    ++$nestedFieldsets;
+                    $fieldsetGroup[] = $field;
+
+                    continue;
+                }
+
+                if ($nestedFieldsets > 0 && $this->fieldHelper->isFieldsetStop($field)) {
+                    --$nestedFieldsets;
+                    $fieldsetGroup[] = $field;
+
+                    continue;
+                }
+            }
+
             // check if we can process duplicates
             if ($this->fieldHelper->isFieldsetStart($field) && (!$allowedDuplicationOnly || $field->allowDuplication)) {
                 // check if nested fieldsets are detected and ensure fields are collected
