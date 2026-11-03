@@ -34,12 +34,15 @@
             }
         });
 
-        // Determine the current duplicate index
-        var lastDuplicateField = document.querySelector(selector + ' [name*="_duplicate_"]:last-child');
+        // Determine the current duplicate index: the highest suffix of all duplicated fields of the group. Neither
+        // the first match nor the last character of the name is reliable (prefilled forms, indexes of 10 and more).
+        document.querySelectorAll(selector + ' [name*="_duplicate_"]').forEach(function(field) {
+            var match = field.getAttribute('name').match(/_duplicate_(\d+)(\[\])?$/);
 
-        if (lastDuplicateField) {
-            duplicateIndex = parseInt(lastDuplicateField.getAttribute('name').slice(-1), 10);
-        }
+            if (match) {
+                duplicateIndex = Math.max(duplicateIndex, parseInt(match[1], 10));
+            }
+        });
 
         function updateFieldsets() {
             fieldsets = document.querySelectorAll(selector);

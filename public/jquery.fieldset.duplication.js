@@ -41,12 +41,14 @@
                 }
             });
 
-            // determine the current duplicate index
-            const lastDuplicateField = Array.from(document.querySelectorAll(selector+' [name*="_duplicate_"]')).pop();
-            
-            if (lastDuplicateField) {
-                duplicateIndex = parseInt(lastDuplicateField.getAttribute('name').slice(-1), 10);
-            }
+            // determine the current duplicate index: the highest suffix of all duplicated fields of the group
+            document.querySelectorAll(selector+' [name*="_duplicate_"]').forEach(function(field) {
+                const match = field.getAttribute('name').match(/_duplicate_(\d+)(\[\])?$/);
+
+                if (match) {
+                    duplicateIndex = Math.max(duplicateIndex, parseInt(match[1], 10));
+                }
+            });
 
             var updateFieldsets = function()
             {
